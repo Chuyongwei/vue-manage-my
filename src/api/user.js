@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 
+// TAG 提交登录信息（后端接口）
 export function login(data) {
   return request({
     url: '/vue-admin-template/user/login',

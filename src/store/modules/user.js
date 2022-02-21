@@ -29,6 +29,7 @@ const mutations = {
 
 const actions = {
   // user login
+  // TAG 登录的业务
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
@@ -36,9 +37,9 @@ const actions = {
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
-        resolve()
+        resolve() // 外部的Promise的方法
       }).catch(error => {
-        reject(error)
+        reject(error)// 报错
       })
     })
   },

@@ -30,6 +30,9 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+
+// TODO 添加导航栏
+// 这里的内容可从this.$router.options.routes
 export const constantRoutes = [
   {
     path: '/login',

@@ -12,6 +12,7 @@
         :collapse-transition="false"
         mode="vertical"
       >
+      <!-- 导航模块 -->
         <sidebar-item v-for="route in routes" :key="route.path" :item="route" :base-path="route.path" />
       </el-menu>
     </el-scrollbar>

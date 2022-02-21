@@ -73,10 +73,12 @@ export default {
       }
     }
     return {
+      // XXX 要改成空的
       loginForm: {
         username: 'admin',
         password: '111111'
       },
+      // TODO: 修改表单规则
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
@@ -95,6 +97,7 @@ export default {
     }
   },
   methods: {
+    // 显示或隐藏密码
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -105,13 +108,17 @@ export default {
         this.$refs.password.focus()
       })
     },
+    // 检查是否可登录
     handleLogin() {
+      // NOTE：使用loginForm上的组件的功能来检查错误
       this.$refs.loginForm.validate(valid => {
-        if (valid) {
+        if (valid) { // 检查成功
           this.loading = true
+          // 发布给VueX 登录信号
+          // TODO: 修改登陆的业务
           this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
+            this.$router.push({ path: this.redirect || '/' }) // 跳转
+            this.loading = false // loading 登录不可用
           }).catch(() => {
             this.loading = false
           })
