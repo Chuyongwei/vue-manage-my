@@ -31,8 +31,11 @@ export default {
     ...mapGetters([
       'sidebar'
     ]),
+    // INFO 过滤了manager页面
     routes() {
-      return this.$router.options.routes
+      // console.log(this.$router.options.routes);
+      const a = this.$router.options.routes.filter(e => e.name !== 'manager')
+      return a
     },
     activeMenu() {
       const route = this.$route

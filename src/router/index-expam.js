@@ -45,7 +45,7 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
-// 首页
+
   {
     path: '/',
     component: Layout,
@@ -58,76 +58,6 @@ export const constantRoutes = [
     }]
   },
 
-  {
-    path: '/patient',
-    component: Layout,
-    name:"patient",
-    redirect:"/patient/subscribe",
-    meta:{title:"治疗病人"},
-    children:[
-      {
-        path: 'subscribe',
-        name: 'subscribe',
-        component: Layout,
-        meta: {title:'预约病人'}
-      },
-      {
-        path: 'check',
-        name: 'check',
-        component: ()=>import('@/views/checkoutpatient'),
-        meta:{title:'查找病人'}
-      },
-
-    ]
-  },
-  {
-    path: '/track',
-    component: Layout,
-    name:"track",
-    redirect:"/track/inhospital",
-    meta:{title:"跟踪管理"},
-    children:[
-      {
-        path:'inhospital',
-        name: 'inhospital',
-        meta:{title:'查看今日病人'}
-      },
-      {
-        path:'outhospital',
-        name: 'outhospital',
-        meta:{title:'查看出院病人'}
-      }
-    ]
-  },
-  // TODO 编写不能写到导航栏中的路由
-  // 使用 words.filter(word => word.length > 6);
-
-  {
-    path: '/manager',
-    component: Layout,
-    name:"manager",
-    redirect:"/manager/checkdetial",
-    meta:{title:"病人管理"},
-    children:[
-      // HACK 可能需要添加查找的页面
-      // XXX 子组件获取参数this.$route.params.id
-      // 
-      {
-        path: 'checkdetial/',
-        name: 'checkdetial',
-        component: Layout,
-        meta:{title:'病人病历'}
-      },
-      // 可能会设计成浮窗
-      {
-        path: 'uploadreport',
-        name: "uploadreport",
-        meta: {title:'提交检查报告'}
-      }
-      
-    ]
-  },
-  //
   {
     path: '/example',
     component: Layout,
