@@ -30,34 +30,37 @@ const mutations = {
 const actions = {
   // user login
   // TAG 登录的业务
+  // user login
   login({ commit }, userInfo) {
     const { username, password } = userInfo
+    console.log("sdafads",userInfo);
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve() // 外部的Promise的方法
+      login({ username: username.trim(), password: password }).then(data => {
+        // const { data } = response
+        commit('SET_TOKEN', data.doctorid)
+        setToken(data.doctorid)
+        resolve()
       }).catch(error => {
-        reject(error)// 报错
+        reject(error)
       })
     })
   },
 
-  // get user info
+  // get user info 这里的token就是医生的doctor——id号
   getInfo({ commit, state }) {
+    console.log("store",state);
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
-
+      getInfo(state.token).then(data => {
+        // const { data } = response
+        console.log("data",data);
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { name } = data
 
         commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        // commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
         reject(error)

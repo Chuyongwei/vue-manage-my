@@ -32,6 +32,7 @@ export default {
     TagsView
   },
   mounted(){
+    console.log("fdsafas");
     console.log(mapState({needTagsView: state => state.settings.tagsView,}));
   },
   mixins: [ResizeMixin],

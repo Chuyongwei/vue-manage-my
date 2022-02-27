@@ -55,7 +55,14 @@ export const constantRoutes = [
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
-    }]
+    },
+    {
+      path:"doctor",
+      naenamem:"doctor",
+      component:()=>import("@/views/Doctor/Doctor.vue"),
+      meta:{title:"医生",icon: 'dashboard'}
+    }
+  ]
   },
 
   {
@@ -113,7 +120,7 @@ export const constantRoutes = [
       // XXX 子组件获取参数this.$route.params.id
       // 
       {
-        path: 'checkdetial/',
+        path: 'checkdetial',
         name: 'checkdetial',
         component: Layout,
         meta:{title:'病人病历'}

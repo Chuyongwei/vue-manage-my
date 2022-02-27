@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 
 // HACK 修改cookie名
-const TokenKey = 'vue_admin_template_token'
+const TokenKey = 'graduation_system_amanger_token'
 
 // INFO Cookie设置
 export function getToken() {
