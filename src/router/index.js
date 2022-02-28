@@ -56,13 +56,32 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
     },
-    {
-      path:"doctor",
-      naenamem:"doctor",
-      component:()=>import("@/views/Doctor/Doctor.vue"),
-      meta:{title:"医生",icon: 'dashboard'}
-    }
+
   ]
+  },
+  {
+    path:"/manager",
+    component: Layout,
+    icon:"DataManager",
+    meta: { title: '管理', icon: 'DataManager' },
+    redirect: '/manager/department',
+    children:[
+      {
+        path:"doctor",
+        name:"doctor",
+        component:()=>import("@/views/Doctor/Doctor.vue"),
+        meta:{title:"医生",icon: 'doctor'}
+      },
+      {
+        path:"department",
+        name:"department",
+        component:()=>import("@/views/Department/Department.vue"),
+        meta:{
+          title: "部门",
+          icon:"dashboard"
+        }
+      }
+    ]
   },
 
   {
