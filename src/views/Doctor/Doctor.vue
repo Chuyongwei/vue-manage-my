@@ -551,15 +551,16 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["timestamp", "title", "type", "importance", "status"];
+        const tHeader = ["医生编号", "医生名字", "所属科室", "职位", "介绍"];
         const filterVal = [
-          "timestamp",
-          "title",
-          "type",
-          "importance",
-          "status",
+          "doctorid",
+          "name",
+          "departmentname",
+          "position",
+          "introduce",
         ];
         const data = this.formatJson(filterVal);
+          console.log("dian");
         excel.export_json_to_excel({
           header: tHeader,
           data,
