@@ -32,11 +32,12 @@ const actions = {
   // TAG 登录的业务
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
-    console.log("sdafads",userInfo);
+    const { doctorid, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(data => {
+      login({ doctorid: doctorid.trim(), password: password }).then(data => {
+        console.log("store接收的",userInfo);
         // const { data } = response
+        console.log("store中的登录",data);
         commit('SET_TOKEN', data.doctorid)
         setToken(data.doctorid)
         resolve()

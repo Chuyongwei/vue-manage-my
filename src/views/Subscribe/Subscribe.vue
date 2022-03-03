@@ -102,40 +102,38 @@
       <!-- NOTE 在列中设置sortable属性即可实现以该列为基准的排序 设置为custom 就是有后端排序 -->
       <!-- NOTE slot-scope设置行中的项的名字 -->
       <el-table-column
-        label="ID"
-        prop="departmentid"
+        label="病历号"
+        prop="medical_id"
         sortable="custom"
         align="center"
-        width="80"
+        width="100"
         :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.departmentid }}</span>
+          <span>{{ row.doctorid }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="名称"
-        width="80px"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.departmentname }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="介绍"
-        min-width="80px"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.introduce }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Status" class-name="status-col" width="100">
+      <!-- <el-table-column label="Date" width="150px" align="center">
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            正 
-          </el-tag>
+          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+        </template>
+      </el-table-column> -->
+      <el-table-column label="患者名字" width="150px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.uname }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="症状" width="110px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.symptoms }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="处方" min-width="110px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.prescription }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column
         label="Actions"
         align="center"
@@ -172,6 +170,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <!-- 分页栏 -->
     <pagination
       v-show="total > 0"
@@ -181,81 +180,50 @@
       @pagination="getList"
     />
 
-    <!-- TAG 添加弹窗 -->
+    <!-- 弹窗 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
         ref="dataForm"
         :rules="rules"
         :model="temp"
         label-position="left"
-        label-width="80px"
+        label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="科室名称" prop="departmentname">
-          <el-input v-model="temp.departmentname" />
+        <el-form-item label="名字" prop="name" style="width: 260px">
+          <el-input v-model="temp.name" placeholder="请输入名字" disabled />
         </el-form-item>
-        <el-form-item label="介绍" prop="introduce">
+        <el-form-item label="状态" prop="state">
+          <el-select
+            v-model="temp.state"
+            class="filter-item"
+            placeholder="Please select"
+          >
+            <el-option
+              v-for="item in states"
+              :key="item.index"
+              :label="item.value"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="症状" prop="symptoms">
           <el-input
             type="textarea"
             :rows="2"
             placeholder="请输入内容"
-            v-model="temp.introduce"
+            v-model="temp.symptoms"
           ></el-input>
         </el-form-item>
-        <el-form-item label="Type" prop="type">
-          <el-select
-            v-model="temp.type"
-            class="filter-item"
-            placeholder="Please select"
-          >
-            <el-option
-              v-for="item in calendarTypeOptions"
-              :key="item.key"
-              :label="item.display_name"
-              :value="item.key"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Date" prop="timestamp">
-          <el-date-picker
-            v-model="temp.timestamp"
-            type="datetime"
-            placeholder="Please pick a date"
-          />
-        </el-form-item>
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title" />
-        </el-form-item>
-        <el-form-item label="Status">
-          <el-select
-            v-model="temp.status"
-            class="filter-item"
-            placeholder="Please select"
-          >
-            <el-option
-              v-for="item in statusOptions"
-              :key="item"
-              :label="item"
-              :value="item"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Imp">
-          <el-rate
-            v-model="temp.importance"
-            :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-            :max="3"
-            style="margin-top: 8px"
-          />
-        </el-form-item>
-        <el-form-item label="Remark">
+        <el-form-item label="处方" prop="prescription">
           <el-input
-            v-model="temp.remark"
-            :autosize="{ minRows: 2, maxRows: 4 }"
             type="textarea"
-            placeholder="Please input"
-          />
+            :rows="2"
+            placeholder="请输入内容"
+            v-model="temp.prescription"
+          ></el-input>
         </el-form-item>
+        
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> Cancel </el-button>
@@ -282,8 +250,7 @@
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false"
-          >Confirm</el-button
-        >
+          >Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -310,7 +277,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {});
 
 export default {
-  name: "DepartmentTable",
+  name: "SubscribeTable",
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -327,20 +294,13 @@ export default {
     },
   },
   data() {
-    let validateIntroduce = (rule, value, callback) => {
-      if (!value) {
-        callback("科室的介绍必须有");
+    let validestate = (rule, value, callback)=>{
+      // console.log(value);
+      if(value=="排队"){
+        return callback(new Error("修改状态"))
       }
-      //TAG 以后要解锁
-      //   if (value.length < 10) {
-      //     callback("科室的介绍不少于10个字");
-      //   }
-      if (value.length > 50) {
-        callback("科室的介绍超过50字");
-      }
-      callback();
-    };
-
+      callback()
+    }
     return {
       tableKey: 0,
       list: null,
@@ -363,60 +323,68 @@ export default {
       statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
-        departmentname: "",
-        introduce: "",
         id: undefined,
         importance: 1,
         remark: "",
+        departmentname: {},
         timestamp: new Date(),
         title: "",
         type: "",
         status: "published",
       },
+      states: [
+        {
+          index: 0,
+          value: "排队",
+        },
+        {
+          index: 1,
+          value: "完成",
+        },
+        {
+          index: 2,
+          value: "入院",
+        },
+      ],
       dialogFormVisible: false,
       dialogStatus: "",
-      //   业务 表现名
       textMap: {
-        update: "更新",
-        create: "创建",
+        update: "Edit",
+        create: "Create",
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        departmentname: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
+        state: [
+          { validator: validestate, trigger: "change" },
         ],
-        introduce: [
-          {
-            validator: validateIntroduce,
-            trigger: "blur",
-          },
+        symptoms: [
+          { required: true, message: "symptoms is required", trigger: "blur" },
         ],
+        prescription: [{ required: true, message: "prescription is required", trigger: "blur" }],
       },
       downloadLoading: false,
     };
   },
-  mounted() {
-    console.log("创建时", this.listQuery);
+  created() {
     this.getList();
   },
   methods: {
     getList() {
       this.listLoading = true;
       // TAG 获取数据
-      console.log("departmen的请求参数", this.listQuery);
-      this.$axios
-        .post("/admin/checkdepartmentby", this.listQuery)
-        .then((response) => {
-          console.log("deparmetn接收到的,", response.data);
-          this.list = response.data.items;
-          this.total = response.data.total;
-
-          // Just to simulate the time of the request
-          setTimeout(() => {
-            this.listLoading = false;
-          }, 1.5 * 1000);
-        });
+      let doctor = null;
+      let requiredata = { ...this.$store.state.user };
+      requiredata.doctorid = requiredata.token;
+      console.log("创建预约", this.$store.state.user);
+      this.$axios.post("/doctor/checksubscribe", requiredata).then((e) => {
+        console.log("checksubscribe接收数据", e.data);
+        let { data } = e;
+        this.list = data;
+        setTimeout(() => {
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
     },
     handleFilter() {
       this.listQuery.page = 1;
@@ -445,8 +413,13 @@ export default {
     },
     resetTemp() {
       this.temp = {
+        doctorid: 0,
+        introduce: "",
+        name: "",
+        departmentname: "",
         id: undefined,
         importance: 1,
+        position: "",
         remark: "",
         timestamp: new Date(),
         title: "",
@@ -462,15 +435,15 @@ export default {
         this.$refs["dataForm"].clearValidate();
       });
     },
-    // TAG 添加数据
     createData() {
-      console.log("创建");
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          //   this.temp.author = "vue-element-admin";
-          console.log("添加的科室请求信息", this.temp);
-          this.$axios.post("admin/addDepartment", this.temp).then(() => {
+          this.temp.author = "vue-element-admin";
+          console.log("添加医生的请求", this.temp);
+          this.$axios.post("doctor/addDoctor", this.temp).then((e) => {
+            let { data } = e;
+            this.temp.doctorid(e);
             this.list.unshift(this.temp);
             this.dialogFormVisible = false;
             this.$notify({
@@ -493,13 +466,15 @@ export default {
       });
     },
     updateData() {
-        console.log("更新部门");
       this.$refs["dataForm"].validate((valid) => {
+        console.log("提交预约",valid);
         if (valid) {
           const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          this.$axios.post("/admin/updateDepartment",tempData).then(() => {
-            const index = this.list.findIndex((v) => v.id === this.temp.id);
+          // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          this.$axios.post("/doctor/commitsubscribe", tempData).then(() => {
+            const index = this.list.findIndex(
+              (v) => v.doctorid === this.temp.doctorid
+            );
             this.list.splice(index, 1, this.temp);
             this.dialogFormVisible = false;
             this.$notify({
@@ -530,15 +505,16 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["timestamp", "title", "type", "importance", "status"];
+        const tHeader = ["医生编号", "医生名字", "所属科室", "职位", "介绍"];
         const filterVal = [
-          "timestamp",
-          "title",
-          "type",
-          "importance",
-          "status",
+          "doctorid",
+          "name",
+          "departmentname",
+          "position",
+          "introduce",
         ];
         const data = this.formatJson(filterVal);
+        // console.log("dian");
         excel.export_json_to_excel({
           header: tHeader,
           data,
@@ -547,7 +523,9 @@ export default {
         this.downloadLoading = false;
       });
     },
+    // TAG 添加excel的导入规则
     formatJson(filterVal) {
+      // TODO 修改导出excel规则，应该使用全部信息的接口的数据
       return this.list.map((v) =>
         filterVal.map((j) => {
           if (j === "timestamp") {

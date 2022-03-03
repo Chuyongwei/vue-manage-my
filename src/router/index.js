@@ -62,7 +62,6 @@ export const constantRoutes = [
   {
     path:"/manager",
     component: Layout,
-    icon:"DataManager",
     meta: { title: '管理', icon: 'DataManager' },
     redirect: '/manager/department',
     children:[
@@ -80,6 +79,13 @@ export const constantRoutes = [
           title: "部门",
           icon:"dashboard"
         }
+      },{
+        path:"bed",
+        name:"bed",
+        component:()=>import("@/views/Bed/Bed.vue"),
+        meta:{
+          title:"病床管理"
+        }
       }
     ]
   },
@@ -87,21 +93,20 @@ export const constantRoutes = [
   {
     path: '/patient',
     component: Layout,
-    name:"patient",
     redirect:"/patient/subscribe",
-    meta:{title:"治疗病人"},
+    meta:{title:"治疗病人",icon:"peoples"},
     children:[
       {
         path: 'subscribe',
         name: 'subscribe',
-        component: Layout,
-        meta: {title:'预约病人'}
+        component: ()=>import("@/views/Subscribe/Subscribe.vue"),
+        meta: {title:'预约病人',icon:"Subscripe"}
       },
       {
-        path: 'check',
-        name: 'check',
-        component: ()=>import('@/views/checkoutpatient'),
-        meta:{title:'查找病人'}
+        path: 'inHospital',
+        name: 'inHospital',
+        component: ()=>import('@/views/Subscribe/InHospital.vue'),
+        meta:{title:'住院病人'}
       },
 
     ]

@@ -403,7 +403,7 @@ export default {
       this.listLoading = true;
       // TAG 获取数据
       this.$axios
-        .get("/doctor/findDeparment")
+        .get("/doctor/checkDeparment")
         .then((e) => {
           console.log("department接收数据", e.data);
           let { data } = e;
@@ -492,7 +492,9 @@ export default {
           this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
           this.temp.author = "vue-element-admin";
           console.log("添加医生的请求", this.temp);
-          this.$axios.post("doctor/addDoctor", this.temp).then(() => {
+          this.$axios.post("doctor/addDoctor", this.temp).then((e) => {
+            let {data} = e;
+            this.temp.doctorid(e)
             this.list.unshift(this.temp);
             this.dialogFormVisible = false;
             this.$notify({
@@ -560,7 +562,7 @@ export default {
           "introduce",
         ];
         const data = this.formatJson(filterVal);
-          console.log("dian");
+          // console.log("dian");
         excel.export_json_to_excel({
           header: tHeader,
           data,
@@ -569,7 +571,9 @@ export default {
         this.downloadLoading = false;
       });
     },
+    // TAG 添加excel的导入规则
     formatJson(filterVal) {
+      // TODO 修改导出excel规则，应该使用全部信息的接口的数据
       return this.list.map((v) =>
         filterVal.map((j) => {
           if (j === "timestamp") {

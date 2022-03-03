@@ -12,15 +12,15 @@
         <h3 class="title">Login Form</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="doctorid">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
+          ref="doctorid"
+          v-model="loginForm.doctorid"
+          placeholder="doctorid"
+          name="doctorid"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -88,7 +88,7 @@ export default {
     return {
       // XXX 要改成空的
       loginForm: {
-        username: "admin",
+        doctorid: "1002",
         password: "654321",
       },
       // TODO: 修改表单规则

@@ -23,20 +23,7 @@
           :value="item"
         />
       </el-select>
-      <el-select
-        v-model="listQuery.type"
-        placeholder="Type"
-        clearable
-        class="filter-item"
-        style="width: 130px"
-      >
-        <el-option
-          v-for="item in calendarTypeOptions"
-          :key="item.key"
-          :label="item.display_name + '(' + item.key + ')'"
-          :value="item.key"
-        />
-      </el-select>
+
       <el-select
         v-model="listQuery.sort"
         style="width: 140px"
@@ -102,15 +89,15 @@
       <!-- NOTE 在列中设置sortable属性即可实现以该列为基准的排序 设置为custom 就是有后端排序 -->
       <!-- NOTE slot-scope设置行中的项的名字 -->
       <el-table-column
-        label="ID"
-        prop="departmentid"
+        label="编号"
+        prop="bid"
         sortable="custom"
         align="center"
         width="80"
         :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.departmentid }}</span>
+          <span>{{ row.bid }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -118,21 +105,21 @@
         width="80px"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.departmentname }}</span>
+          <span>{{ row.bedname }}</span>
         </template>
       </el-table-column>
       <el-table-column
-        label="介绍"
+        label="地址"
         min-width="80px"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.introduce }}</span>
+          <span>{{ row.address }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Status" class-name="status-col" width="100">
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            正 
+          <el-tag :type="row.type | statusFilter">
+            {{row.type}} 
           </el-tag>
         </template>
       </el-table-column>
@@ -191,66 +178,26 @@
         label-width="80px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="科室名称" prop="departmentname">
-          <el-input v-model="temp.departmentname" />
+        <el-form-item label="病床编号" prop="bid" >
+          <el-input v-model="temp.bid" disabled/>
         </el-form-item>
-        <el-form-item label="介绍" prop="introduce">
-          <el-input
-            type="textarea"
-            :rows="2"
-            placeholder="请输入内容"
-            v-model="temp.introduce"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="Type" prop="type">
+        <el-form-item label="类型" prop="type">
           <el-select
             v-model="temp.type"
             class="filter-item"
             placeholder="Please select"
           >
             <el-option
-              v-for="item in calendarTypeOptions"
+              v-for="item in bedtype"
               :key="item.key"
-              :label="item.display_name"
-              :value="item.key"
+              :label="item.value"
+              :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="Date" prop="timestamp">
-          <el-date-picker
-            v-model="temp.timestamp"
-            type="datetime"
-            placeholder="Please pick a date"
-          />
-        </el-form-item>
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title" />
-        </el-form-item>
-        <el-form-item label="Status">
-          <el-select
-            v-model="temp.status"
-            class="filter-item"
-            placeholder="Please select"
-          >
-            <el-option
-              v-for="item in statusOptions"
-              :key="item"
-              :label="item"
-              :value="item"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Imp">
-          <el-rate
-            v-model="temp.importance"
-            :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-            :max="3"
-            style="margin-top: 8px"
-          />
-        </el-form-item>
-        <el-form-item label="Remark">
+        <el-form-item label="地址">
           <el-input
-            v-model="temp.remark"
+            v-model="temp.address"
             :autosize="{ minRows: 2, maxRows: 4 }"
             type="textarea"
             placeholder="Please input"
@@ -296,19 +243,12 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
-const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
 
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
-
+let bedtype = [
+    {key:0,value:"静养"},
+    {key:1,value:"公共"},
+    {key:2,value:"重症"}
+]
 export default {
   name: "DepartmentTable",
   components: { Pagination },
@@ -331,10 +271,6 @@ export default {
       if (!value) {
         callback("科室的介绍必须有");
       }
-      //TAG 以后要解锁
-      //   if (value.length < 10) {
-      //     callback("科室的介绍不少于10个字");
-      //   }
       if (value.length > 50) {
         callback("科室的介绍超过50字");
       }
@@ -355,7 +291,6 @@ export default {
         sort: "+id",
       },
       importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
       sortOptions: [
         { label: "ID Ascending", key: "+id" },
         { label: "ID Descending", key: "-id" },
@@ -375,6 +310,7 @@ export default {
       },
       dialogFormVisible: false,
       dialogStatus: "",
+      bedtype,
       //   业务 表现名
       textMap: {
         update: "更新",
@@ -397,16 +333,15 @@ export default {
     };
   },
   mounted() {
-    console.log("创建时", this.listQuery);
     this.getList();
   },
   methods: {
     getList() {
       this.listLoading = true;
       // TAG 获取数据
-      console.log("departmen的请求参数", this.listQuery);
+    //   console.log("departmen的请求参数", this.listQuery);
       this.$axios
-        .post("/admin/checkdepartmentby", this.listQuery)
+        .post("/admin/checkBedbypage", this.listQuery)
         .then((response) => {
           console.log("deparmetn接收到的,", response.data);
           this.list = response.data.items;
@@ -470,7 +405,7 @@ export default {
           this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
           //   this.temp.author = "vue-element-admin";
           console.log("添加的科室请求信息", this.temp);
-          this.$axios.post("admin/addDepartment", this.temp).then(() => {
+          this.$axios.post("admin/addBed", this.temp).then(() => {
             this.list.unshift(this.temp);
             this.dialogFormVisible = false;
             this.$notify({
