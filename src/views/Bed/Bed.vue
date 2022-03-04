@@ -101,11 +101,11 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="名称"
+        label="病人名字"
         width="80px"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.bedname }}</span>
+          <span>{{ row.uname }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -179,7 +179,7 @@
         style="width: 400px; margin-left: 50px"
       >
         <el-form-item label="病床编号" prop="bid" >
-          <el-input v-model="temp.bid" disabled/>
+          <el-input v-model="temp.bid" />
         </el-form-item>
         <el-form-item label="类型" prop="type">
           <el-select
@@ -339,11 +339,11 @@ export default {
     getList() {
       this.listLoading = true;
       // TAG 获取数据
-    //   console.log("departmen的请求参数", this.listQuery);
+      console.log("bed的请求参数", this.listQuery);
       this.$axios
         .post("/admin/checkBedbypage", this.listQuery)
         .then((response) => {
-          console.log("deparmetn接收到的,", response.data);
+          console.log("bed接收到的,", response.data);
           this.list = response.data.items;
           this.total = response.data.total;
 
@@ -402,11 +402,9 @@ export default {
       console.log("创建");
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          //   this.temp.author = "vue-element-admin";
           console.log("添加的科室请求信息", this.temp);
-          this.$axios.post("admin/addBed", this.temp).then(() => {
-            this.list.unshift(this.temp);
+          this.$axios.post("admin/addBed", this.temp).then((e) => {
+            this.list.unshift(e.data);
             this.dialogFormVisible = false;
             this.$notify({
               title: "Success",
@@ -433,7 +431,7 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp);
           tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          this.$axios.post("/admin/updateDepartment",tempData).then(() => {
+          this.$axios.post("/admin/updateBed",tempData).then(() => {
             const index = this.list.findIndex((v) => v.id === this.temp.id);
             this.list.splice(index, 1, this.temp);
             this.dialogFormVisible = false;
@@ -448,6 +446,10 @@ export default {
       });
     },
     handleDelete(row, index) {
+      console.log("删除",row);
+      this.$axios.post("admin/deleteBed",row).then(e=>{
+
+      })
       this.$notify({
         title: "Success",
         message: "Delete Successfully",

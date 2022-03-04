@@ -89,6 +89,21 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path:"/score",
+    component: Layout,
+    meta:{title:"记录",},
+    children:[
+      {
+        path:"bedscore",
+        name:"bedscore",
+        component:()=>import("@/views/Score/BedScore.vue"),
+        meta:{
+          title:"病床记录"
+        }
+      }
+    ]
+  },
 
   {
     path: '/patient',
@@ -108,6 +123,12 @@ export const constantRoutes = [
         component: ()=>import('@/views/Subscribe/InHospital.vue'),
         meta:{title:'住院病人'}
       },
+      {
+        path: "tracking",
+        name:"tracking",
+        component:()=>import("@/views/Tracking/Tracking.vue"),
+        meta:{title:"跟踪病人"}
+      }
 
     ]
   },
