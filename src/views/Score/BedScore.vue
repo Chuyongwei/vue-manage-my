@@ -90,7 +90,7 @@
       <!-- NOTE slot-scope设置行中的项的名字 -->
       <el-table-column
         label="编号"
-        prop="bid"
+        prop="bsid"
         sortable="custom"
         align="center"
         width="80"
@@ -109,17 +109,17 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="地址"
+        label="床号"
         min-width="80px"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.address }}</span>
+          <span>{{ row.bid }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Status" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-tag :type="row.type | statusFilter">
-            {{row.type}} 
+            {{row.status}} 
           </el-tag>
         </template>
       </el-table-column>
@@ -250,7 +250,7 @@ let bedtype = [
     {key:2,value:"重症"}
 ]
 export default {
-  name: "DepartmentTable",
+  name: "BedTable",
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -339,9 +339,9 @@ export default {
     getList() {
       this.listLoading = true;
       // TAG 获取数据
-      console.log("bed的请求参数", this.listQuery);
+      console.log("bedscore的请求参数", this.listQuery);
       this.$axios
-        .post("/admin/checkBedbypage", this.listQuery)
+        .post("/admin/checkBedScoreby", this.listQuery)
         .then((response) => {
           console.log("bed接收到的,", response.data);
           this.list = response.data.items;

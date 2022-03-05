@@ -132,25 +132,6 @@ export const constantRoutes = [
 
     ]
   },
-  {
-    path: '/track',
-    component: Layout,
-    name:"track",
-    redirect:"/track/inhospital",
-    meta:{title:"跟踪管理"},
-    children:[
-      {
-        path:'inhospital',
-        name: 'inhospital',
-        meta:{title:'查看今日病人'}
-      },
-      {
-        path:'outhospital',
-        name: 'outhospital',
-        meta:{title:'查看出院病人'}
-      }
-    ]
-  },
   // TODO 编写不能写到导航栏中的路由
   // 使用 words.filter(word => word.length > 6);
 

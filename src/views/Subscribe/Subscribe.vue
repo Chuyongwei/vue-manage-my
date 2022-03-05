@@ -30,12 +30,6 @@
         class="filter-item"
         style="width: 130px"
       >
-        <el-option
-          v-for="item in calendarTypeOptions"
-          :key="item.key"
-          :label="item.display_name + '(' + item.key + ')'"
-          :value="item.key"
-        />
       </el-select>
       <el-select
         v-model="listQuery.sort"
@@ -191,7 +185,7 @@
         style="width: 400px; margin-left: 50px"
       >
         <el-form-item label="名字" prop="name" style="width: 260px">
-          <el-input v-model="temp.name" placeholder="请输入名字" disabled />
+          <el-input v-model="temp.uname" placeholder="请输入名字" disabled />
         </el-form-item>
         <el-form-item label="状态" prop="state">
           <el-select
@@ -223,7 +217,22 @@
             v-model="temp.prescription"
           ></el-input>
         </el-form-item>
-        
+          <template v-if="isInhospital">
+            <el-form-item label="住院状态" prop="state">
+              <el-select
+                v-model="temp.type"
+                class="filter-item"
+                placeholder="Please select"
+              >
+                <el-option
+                  v-for="item in bedtype"
+                  :key="item.index"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> Cancel </el-button>
@@ -250,7 +259,8 @@
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false"
-          >Confirm</el-button>
+          >Confirm</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -262,19 +272,6 @@
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-
-const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
-
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
 
 export default {
   name: "SubscribeTable",
@@ -294,13 +291,13 @@ export default {
     },
   },
   data() {
-    let validestate = (rule, value, callback)=>{
+    let validestate = (rule, value, callback) => {
       // console.log(value);
-      if(value=="排队"){
-        return callback(new Error("修改状态"))
+      if (value == "排队") {
+        return callback(new Error("修改状态"));
       }
-      callback()
-    }
+      callback();
+    };
     return {
       tableKey: 0,
       list: null,
@@ -315,7 +312,6 @@ export default {
         sort: "+id",
       },
       importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
       sortOptions: [
         { label: "ID Ascending", key: "+id" },
         { label: "ID Descending", key: "-id" },
@@ -323,14 +319,7 @@ export default {
       statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        departmentname: {},
-        timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        state: "排队",
       },
       states: [
         {
@@ -343,9 +332,24 @@ export default {
         },
         {
           index: 2,
-          value: "入院",
+          value: "住院",
         },
       ],
+      bedtype:[
+        {
+          index:0,
+          value:"公共"
+        },
+        {
+          index:1,
+          value:"静养"
+        },
+        {
+          index:2,
+          value:"重症"
+        }
+      ],
+      isInhospital: false,
       dialogFormVisible: false,
       dialogStatus: "",
       textMap: {
@@ -355,19 +359,32 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        state: [
-          { validator: validestate, trigger: "change" },
-        ],
+        state: [{ validator: validestate, trigger: "change" }],
         symptoms: [
           { required: true, message: "symptoms is required", trigger: "blur" },
         ],
-        prescription: [{ required: true, message: "prescription is required", trigger: "blur" }],
+        prescription: [
+          {
+            required: true,
+            message: "prescription is required",
+            trigger: "blur",
+          },
+        ],
       },
       downloadLoading: false,
     };
   },
   created() {
     this.getList();
+  },
+  watch: {
+    "temp.state"() {
+      if (this.temp.state == "住院") {
+        this.isInhospital = true
+      } else {
+        this.isInhospital = false;
+      }
+    },
   },
   methods: {
     getList() {
@@ -413,18 +430,10 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        doctorid: 0,
+        nedname: "",
         introduce: "",
         name: "",
         departmentname: "",
-        id: undefined,
-        importance: 1,
-        position: "",
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
       };
     },
     handleCreate() {
@@ -467,7 +476,7 @@ export default {
     },
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
-        console.log("提交预约",valid);
+        console.log("提交预约", valid);
         if (valid) {
           const tempData = Object.assign({}, this.temp);
           // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
