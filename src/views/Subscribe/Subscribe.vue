@@ -217,22 +217,22 @@
             v-model="temp.prescription"
           ></el-input>
         </el-form-item>
-          <template v-if="isInhospital">
-            <el-form-item label="住院状态" prop="state">
-              <el-select
-                v-model="temp.type"
-                class="filter-item"
-                placeholder="Please select"
-              >
-                <el-option
-                  v-for="item in bedtype"
-                  :key="item.index"
-                  :label="item.value"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </template>
+        <template v-if="isInhospital">
+          <el-form-item label="住院状态" prop="state">
+            <el-select
+              v-model="temp.type"
+              class="filter-item"
+              placeholder="Please select"
+            >
+              <el-option
+                v-for="item in bedtype"
+                :key="item.index"
+                :label="item.value"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> Cancel </el-button>
@@ -298,6 +298,24 @@ export default {
       }
       callback();
     };
+    bedtype = [
+      {
+        index: 0,
+        value: "公共",
+      },
+      {
+        index: 1,
+        value: "静养",
+      },
+      {
+        index: 2,
+        value: "重症",
+      },
+      {
+        index: 5,
+        value: "跟踪",
+      },
+    ];
     return {
       tableKey: 0,
       list: null,
@@ -335,20 +353,7 @@ export default {
           value: "住院",
         },
       ],
-      bedtype:[
-        {
-          index:0,
-          value:"公共"
-        },
-        {
-          index:1,
-          value:"静养"
-        },
-        {
-          index:2,
-          value:"重症"
-        }
-      ],
+      bedtype,
       isInhospital: false,
       dialogFormVisible: false,
       dialogStatus: "",
@@ -380,7 +385,7 @@ export default {
   watch: {
     "temp.state"() {
       if (this.temp.state == "住院") {
-        this.isInhospital = true
+        this.isInhospital = true;
       } else {
         this.isInhospital = false;
       }

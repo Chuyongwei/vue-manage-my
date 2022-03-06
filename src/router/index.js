@@ -126,7 +126,7 @@ export const constantRoutes = [
       {
         path: "tracking",
         name:"tracking",
-        component:()=>import("@/views/Tracking/Tracking.vue"),
+        component:()=>import("@/views/Score/Tracking.vue"),
         meta:{title:"跟踪病人"}
       }
 
