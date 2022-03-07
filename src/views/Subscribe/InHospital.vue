@@ -186,11 +186,11 @@
         :rules="rules"
         :model="temp"
         label-position="left"
-        label-width="70px"
+        label-width="90px"
         style="width: 400px; margin-left: 50px"
       >
         <el-form-item label="名字" prop="name" style="width: 260px">
-          <el-input v-model="temp.name" placeholder="请输入名字" disabled />
+          <el-input v-model="temp.uname" placeholder="请输入名字" disabled />
         </el-form-item>
         <el-form-item label="状态" prop="state">
           <el-select
@@ -222,6 +222,39 @@
             v-model="temp.prescription"
           ></el-input>
         </el-form-item>
+        <!-- TAG 是否要跟踪 -->
+        <template v-if="isTrack">
+          <el-form-item label="下次日期" prop="tracking_date">
+            <el-date-picker
+              v-model="temp.tracking_date"
+              align="right"
+              type="date"
+              placeholder="选择日期"
+              :picker-options="pickerOptions"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="跟踪地址" prop="trackaddress">
+            <el-input v-model="temp.trackaddress" placeholder="请输入地址" />
+          </el-form-item>
+        </template>
+        <!-- TAG 是否转院 -->
+        <template v-if="isTransfer">
+          <el-form-item label="住院状态" prop="state">
+            <el-select
+              v-model="temp.type"
+              class="filter-item"
+              placeholder="Please select"
+            >
+              <el-option
+                v-for="item in bedtype"
+                :key="item.index"
+                :label="item.value"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> Cancel </el-button>
@@ -279,14 +312,65 @@ export default {
       return calendarTypeKeyValue[type];
     },
   },
-  watch:{
-    "temp.state"(){
-      if(this.temp.state=="转院"){
+  watch: {
+    "temp.state"() {
+      this.isTransfer = false
+      this.isTrack = false
+      if (this.temp.state == "转院") {
+        this.isTransfer = true
         console.log("病人出院了");
       }
-    }
+      if (this.temp.state == "跟踪") {
+        this.isTrack = true;
+        console.log("跟踪病人");
+      }
+    },
   },
   data() {
+    let bedtype = [
+      {
+        index: 0,
+        value: "公共",
+      },
+      {
+        index: 1,
+        value: "静养",
+      },
+      {
+        index: 2,
+        value: "重症",
+      },
+    ];
+    // TAG 日期管理
+    let pickerOptions = {
+      disabledDate(time) {
+        return time.getTime() < Date.now();
+      },
+      shortcuts: [
+        {
+          text: "今天",
+          onClick(picker) {
+            picker.$emit("pick", new Date());
+          },
+        },
+        {
+          text: "明天",
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24);
+            picker.$emit("pick", date);
+          },
+        },
+        {
+          text: "一周后",
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
+            picker.$emit("pick", date);
+          },
+        },
+      ],
+    };
     return {
       tableKey: 0,
       list: null,
@@ -331,6 +415,10 @@ export default {
           value: "跟踪",
         },
       ],
+      isTrack: false,
+      isTransfer: false,
+      bedtype,
+      pickerOptions,
       dialogFormVisible: false,
       dialogStatus: "",
       textMap: {
@@ -424,27 +512,6 @@ export default {
         this.$refs["dataForm"].clearValidate();
       });
     },
-    createData() {
-      this.$refs["dataForm"].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
-          console.log("添加医生的请求", this.temp);
-          this.$axios.post("doctor/addDoctor", this.temp).then((e) => {
-            let { data } = e;
-            this.temp.doctorid(e);
-            this.list.unshift(this.temp);
-            this.dialogFormVisible = false;
-            this.$notify({
-              title: "Success",
-              message: "Created Successfully",
-              type: "success",
-              duration: 2000,
-            });
-          });
-        }
-      });
-    },
     handleUpdate(row) {
       this.temp = Object.assign({}, row); // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp);
@@ -456,10 +523,11 @@ export default {
     },
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
-        console.log("修改状态", valid);
         if (valid) {
           const tempData = Object.assign({}, this.temp);
-          // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          tempData.tracking_date = this.dateFormat(tempData.tracking_date);
+          console.log(tempData);
+          /*
           this.$axios.post("/doctor/commitsubscribe", tempData).then(() => {
             const index = this.list.findIndex(
               (v) => v.doctorid === this.temp.doctorid
@@ -473,8 +541,19 @@ export default {
               duration: 2000,
             });
           });
+          */
         }
       });
+    },
+    dateFormat(dateData) {
+      var date = new Date(dateData);
+      var y = date.getFullYear();
+      var m = date.getMonth() + 1;
+      m = m < 10 ? "0" + m : m;
+      var d = date.getDate();
+      d = d < 10 ? "0" + d : d;
+      const time = y + "-" + m + "-" + d;
+      return time;
     },
     handleDelete(row, index) {
       this.$notify({

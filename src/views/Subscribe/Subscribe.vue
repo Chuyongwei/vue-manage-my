@@ -311,10 +311,6 @@ export default {
         index: 2,
         value: "重症",
       },
-      {
-        index: 5,
-        value: "跟踪",
-      },
     ];
     return {
       tableKey: 0,
@@ -351,6 +347,10 @@ export default {
         {
           index: 2,
           value: "住院",
+        },
+        {
+          index: 5,
+          value: "跟踪",
         },
       ],
       bedtype,
