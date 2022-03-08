@@ -224,9 +224,9 @@
         </el-form-item>
         <!-- TAG 是否要跟踪 -->
         <template v-if="isTrack">
-          <el-form-item label="下次日期" prop="tracking_date">
+          <el-form-item label="下次日期" prop="trackdate">
             <el-date-picker
-              v-model="temp.tracking_date"
+              v-model="temp.trackdate"
               align="right"
               type="date"
               placeholder="选择日期"
@@ -320,7 +320,7 @@ export default {
         this.isTransfer = true
         console.log("病人出院了");
       }
-      if (this.temp.state == "跟踪") {
+      if (this.temp.state == "出院") {
         this.isTrack = true;
         console.log("跟踪病人");
       }
@@ -525,14 +525,13 @@ export default {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp);
-          tempData.tracking_date = this.dateFormat(tempData.tracking_date);
-          console.log(tempData);
-          /*
+          tempData.trackdate = this.dateFormat(tempData.trackdate);
+          
           this.$axios.post("/doctor/commitsubscribe", tempData).then(() => {
-            const index = this.list.findIndex(
-              (v) => v.doctorid === this.temp.doctorid
-            );
-            this.list.splice(index, 1, this.temp);
+            // const index = this.list.findIndex(
+            //   (v) => v.doctorid === this.temp.doctorid
+            // );
+            // this.list.splice(index, 1, this.temp);
             this.dialogFormVisible = false;
             this.$notify({
               title: "Success",
@@ -540,8 +539,9 @@ export default {
               type: "success",
               duration: 2000,
             });
+            
           });
-          */
+          
         }
       });
     },

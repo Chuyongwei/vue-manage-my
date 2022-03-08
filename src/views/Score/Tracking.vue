@@ -94,33 +94,32 @@
         sortable="custom"
         align="center"
         width="80"
-        :class-name="getSortClass('id')"
+        :class-name="getSortClass('recordid')"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.bid }}</span>
+          <span>{{ row.recordid }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="病人名字"
-        width="80px"
-      >
+      <el-table-column label="病人名字" width="80px">
         <template slot-scope="{ row }">
           <span>{{ row.uname }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="床号"
-        min-width="80px"
-      >
+      <el-table-column label="跟踪日期" width="120px">
         <template slot-scope="{ row }">
-          <span>{{ row.bid }}</span>
+          <span>{{ row.trackdate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Status" class-name="status-col" width="100">
-        <template slot-scope="{row}">
+      <el-table-column label="状态" class-name="status-col" width="80px">
+        <template slot-scope="{ row }">
           <el-tag :type="row.type | statusFilter">
-            {{row.status}} 
+            {{ row.status }}
           </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="地址" min-width="80px">
+        <template slot-scope="{ row }">
+          <span>{{ row.trackaddress }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -178,31 +177,49 @@
         label-width="80px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="病床编号" prop="bid" >
-          <el-input v-model="temp.bid" />
+        <el-form-item label="编号" prop="recordid">
+          <el-input v-model="temp.recordid" disabled />
+        </el-form-item>
+        <el-form-item label="姓名" prop="recordid">
+          <el-input v-model="temp.uname" disabled />
         </el-form-item>
         <el-form-item label="类型" prop="type">
           <el-select
-            v-model="temp.type"
+            v-model="temp.conditions"
             class="filter-item"
             placeholder="Please select"
           >
             <el-option
-              v-for="item in bedtype"
+              v-for="item in conditions"
               :key="item.key"
               :label="item.value"
               :value="item.value"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="地址">
+        <el-form-item label="备注">
           <el-input
-            v-model="temp.address"
+            v-model="temp.other"
             :autosize="{ minRows: 2, maxRows: 4 }"
             type="textarea"
             placeholder="Please input"
           />
         </el-form-item>
+        <template v-if="isTrack">
+          <el-form-item label="下次日期" prop="trackdate">
+            <el-date-picker
+              v-model="temp.retrackdate"
+              align="right"
+              type="date"
+              placeholder="选择日期"
+              :picker-options="pickerOptions"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="跟踪地址" prop="trackaddress">
+            <el-input v-model="temp.retrackaddress" placeholder="请输入地址" />
+          </el-form-item>
+        </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> Cancel </el-button>
@@ -243,12 +260,11 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
-
-let bedtype = [
-    {key:0,value:"静养"},
-    {key:1,value:"公共"},
-    {key:2,value:"重症"}
-]
+let conditions = [
+  { key: 0, value: "正常" },
+  { key: 1, value: "跟踪" },
+  { key: 2, value: "重症" },
+];
 export default {
   name: "BedTable",
   components: { Pagination },
@@ -266,6 +282,15 @@ export default {
       return calendarTypeKeyValue[type];
     },
   },
+  watch: {
+    "temp.conditions"() {
+      if (this.temp.conditions == "跟踪") {
+        this.isTrack = true;
+      } else {
+        this.isTrack = false;
+      }
+    },
+  },
   data() {
     let validateIntroduce = (rule, value, callback) => {
       if (!value) {
@@ -276,7 +301,35 @@ export default {
       }
       callback();
     };
-
+    let pickerOptions = {
+      disabledDate(time) {
+        return time.getTime() < Date.now();
+      },
+      shortcuts: [
+        {
+          text: "今天",
+          onClick(picker) {
+            picker.$emit("pick", new Date());
+          },
+        },
+        {
+          text: "明天",
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24);
+            picker.$emit("pick", date);
+          },
+        },
+        {
+          text: "一周后",
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
+            picker.$emit("pick", date);
+          },
+        },
+      ],
+    };
     return {
       tableKey: 0,
       list: null,
@@ -298,19 +351,16 @@ export default {
       statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
-        departmentname: "",
-        introduce: "",
-        id: undefined,
         importance: 1,
-        remark: "",
-        timestamp: new Date(),
         title: "",
         type: "",
-        status: "published",
+        conditions: "",
       },
+      pickerOptions,
+      isTrack: false,
       dialogFormVisible: false,
       dialogStatus: "",
-      bedtype,
+      conditions,
       //   业务 表现名
       textMap: {
         update: "更新",
@@ -402,21 +452,21 @@ export default {
     // TAG 添加数据
     createData() {
       console.log("创建");
-      this.$refs["dataForm"].validate((valid) => {
-        if (valid) {
-          console.log("添加的科室请求信息", this.temp);
-          this.$axios.post("admin/addBed", this.temp).then((e) => {
-            this.list.unshift(e.data);
-            this.dialogFormVisible = false;
-            this.$notify({
-              title: "Success",
-              message: "Created Successfully",
-              type: "success",
-              duration: 2000,
-            });
-          });
-        }
-      });
+      // this.$refs["dataForm"].validate((valid) => {
+      //   if (valid) {
+      //     console.log("添加的科室请求信息", this.temp);
+      //     this.$axios.post("admin/addBed", this.temp).then((e) => {
+      //       this.list.unshift(e.data);
+      //       this.dialogFormVisible = false;
+      //       this.$notify({
+      //         title: "Success",
+      //         message: "Created Successfully",
+      //         type: "success",
+      //         duration: 2000,
+      //       });
+      //     });
+      //   }
+      // });
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row); // copy obj
@@ -428,12 +478,12 @@ export default {
       });
     },
     updateData() {
-        console.log("更新部门");
+      console.log("提交跟踪记录");
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp);
           tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          this.$axios.post("/admin/updateBed",tempData).then(() => {
+          this.$axios.post("/admin/commitTrack", tempData).then(() => {
             const index = this.list.findIndex((v) => v.id === this.temp.id);
             this.list.splice(index, 1, this.temp);
             this.dialogFormVisible = false;
@@ -448,10 +498,8 @@ export default {
       });
     },
     handleDelete(row, index) {
-      console.log("删除",row);
-      this.$axios.post("admin/deleteBed",row).then(e=>{
-
-      })
+      console.log("删除", row);
+      this.$axios.post("admin/deleteBed", row).then((e) => {});
       this.$notify({
         title: "Success",
         message: "Delete Successfully",

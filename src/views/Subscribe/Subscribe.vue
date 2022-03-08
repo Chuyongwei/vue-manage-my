@@ -217,6 +217,7 @@
             v-model="temp.prescription"
           ></el-input>
         </el-form-item>
+        <!-- 是否住院 -->
         <template v-if="isInhospital">
           <el-form-item label="住院状态" prop="state">
             <el-select
@@ -231,6 +232,22 @@
                 :value="item.value"
               ></el-option>
             </el-select>
+          </el-form-item>
+        </template>
+        <!-- 是否跟踪 -->
+        <template v-if="isTrack">
+          <el-form-item label="下次日期" prop="trackdate">
+            <el-date-picker
+              v-model="temp.trackdate"
+              align="right"
+              type="date"
+              placeholder="选择日期"
+              :picker-options="pickerOptions"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="跟踪地址" prop="trackaddress">
+            <el-input v-model="temp.trackaddress" placeholder="请输入地址" />
           </el-form-item>
         </template>
       </el-form>
@@ -298,7 +315,7 @@ export default {
       }
       callback();
     };
-    bedtype = [
+    let bedtype = [
       {
         index: 0,
         value: "公共",
@@ -354,6 +371,7 @@ export default {
         },
       ],
       bedtype,
+      isTrack: false,
       isInhospital: false,
       dialogFormVisible: false,
       dialogStatus: "",
@@ -388,6 +406,11 @@ export default {
         this.isInhospital = true;
       } else {
         this.isInhospital = false;
+      }
+      if (this.temp.state == "跟踪") {
+        this.isTrack = true;
+      } else {
+        this.isTrack = false;
       }
     },
   },
