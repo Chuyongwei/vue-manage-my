@@ -5,6 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
+import VueRouter from 'vue-router'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -59,36 +60,7 @@ export const constantRoutes = [
 
   ]
   },
-  {
-    path:"/manager",
-    component: Layout,
-    meta: { title: '管理', icon: 'DataManager' },
-    redirect: '/manager/department',
-    children:[
-      {
-        path:"doctor",
-        name:"doctor",
-        component:()=>import("@/views/Doctor/Doctor.vue"),
-        meta:{title:"医生",icon: 'doctor'}
-      },
-      {
-        path:"department",
-        name:"department",
-        component:()=>import("@/views/Department/Department.vue"),
-        meta:{
-          title: "部门",
-          icon:"dashboard"
-        }
-      },{
-        path:"bed",
-        name:"bed",
-        component:()=>import("@/views/Bed/Bed.vue"),
-        meta:{
-          title:"病床管理"
-        }
-      }
-    ]
-  },
+
   {
     path:"/score",
     component: Layout,
@@ -132,56 +104,36 @@ export const constantRoutes = [
 
     ]
   },
-  // TODO 编写不能写到导航栏中的路由
+  // TAG 编写不能写到导航栏中的路由
   // 使用 words.filter(word => word.length > 6);
 
-  {
-    path: '/manager',
-    component: Layout,
-    name:"manager",
-    redirect:"/manager/checkdetial",
-    meta:{title:"病人管理"},
-    children:[
-      // HACK 可能需要添加查找的页面
-      // XXX 子组件获取参数this.$route.params.id
-      // 
-      {
-        path: 'checkdetial',
-        name: 'checkdetial',
-        component: Layout,
-        meta:{title:'病人病历'}
-      },
-      // 可能会设计成浮窗
-      {
-        path: 'uploadreport',
-        name: "uploadreport",
-        meta: {title:'提交检查报告'}
-      }
+  // {
+  //   path: '/manager2',
+  //   component: Layout,
+  //   name:"manager",
+  //   redirect:"/manager/checkdetial",
+  //   meta:{title:"病人管理"},
+  //   children:[
+  //     // HACK 可能需要添加查找的页面
+  //     // XXX 子组件获取参数this.$route.params.id
+  //     // 
+  //     {
+  //       path: 'checkdetial',
+  //       name: 'checkdetial',
+  //       component: Layout,
+  //       meta:{title:'病人病历'}
+  //     },
+  //     // 可能会设计成浮窗
+  //     {
+  //       path: 'uploadreport',
+  //       name: "uploadreport",
+  //       meta: {title:'提交检查报告'}
+  //     }
       
-    ]
-  },
+  //   ]
+  // },
   //
-  {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
-    children: [
-      {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
+
 
   {
     path: '/form',
@@ -285,3 +237,55 @@ export function resetRouter() {
 }
 
 export default router
+
+// TAG 动态路由
+export const asyncRoutes = [  {
+  path:"/manager",
+  component: Layout,
+  meta: { title: '管理', icon: 'DataManager' },
+  redirect: '/manager/department',
+  children:[
+    {
+      path:"doctor",
+      name:"doctor",
+      component:()=>import("@/views/Doctor/Doctor.vue"),
+      meta:{title:"医生",icon: 'doctor'}
+    },
+    {
+      path:"department",
+      name:"department",
+      component:()=>import("@/views/Department/Department.vue"),
+      meta:{
+        title: "部门",
+        icon:"dashboard"
+      }
+    },{
+      path:"bed",
+      name:"bed",
+      component:()=>import("@/views/Bed/Bed.vue"),
+      meta:{
+        title:"病床管理"
+      }
+    }
+  ]
+},{
+  path: '/example',
+  component: Layout,
+  redirect: '/example/table',
+  name: 'Example',
+  meta: { title: 'Example', icon: 'el-icon-s-help' },
+  children: [
+    {
+      path: 'table',
+      name: 'Table',
+      component: () => import('@/views/table/index'),
+      meta: { title: 'Table', icon: 'table' }
+    },
+    {
+      path: 'tree',
+      name: 'Tree',
+      component: () => import('@/views/tree/index'),
+      meta: { title: 'Tree', icon: 'tree' }
+    }
+  ]
+},]
