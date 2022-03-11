@@ -37,7 +37,7 @@ export const asyncRoutes = [{
   path: '/patient',
   component: Layout,
   redirect: "/patient/subscribe",
-  meta: { title: "治疗病人", icon: "peoples", roles: ["doctor"] },
+  meta: { title: "治疗病人", icon: "patient", roles: ["doctor"] },
   children: [
     {
       path: 'subscribe',
@@ -49,13 +49,21 @@ export const asyncRoutes = [{
       path: 'inHospital',
       name: 'inHospital',
       component: () => import('@/views/Subscribe/InHospital.vue'),
-      meta: { title: '住院病人', roles: ["doctor"] }
+      meta: {
+        title: '住院病人',
+        icon: "inHospital",
+        roles: ["doctor"]
+      }
     },
     {
       path: "tracking",
       name: "tracking",
       component: () => import("@/views/Score/Tracking.vue"),
-      meta: { title: "跟踪病人", roles: ["doctor"] }
+      meta: { 
+        title: "跟踪病人",
+        icon: "trackScore", 
+        roles: ["doctor"],
+       }
     }
 
   ]
@@ -86,6 +94,7 @@ export const asyncRoutes = [{
       component: () => import("@/views/Bed/Bed.vue"),
       meta: {
         title: "病床管理",
+        icon: 'bed',
         roles: ["admin"]
       }
     }
@@ -130,7 +139,8 @@ export const constantRoutes = [
         name: "bedscore",
         component: () => import("@/views/Score/BedScore.vue"),
         meta: {
-          title: "病床记录"
+          title: "病床记录",
+          icon: "score"
         }
       }
     ]

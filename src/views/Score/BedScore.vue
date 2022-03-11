@@ -3,26 +3,12 @@
     <!-- 筛选栏 -->
     <div class="filter-container">
       <el-input
-        v-model="listQuery.title"
-        placeholder="Title"
+        v-model="listQuery.uname"
+        placeholder="名字"
         style="width: 200px"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
-      <el-select
-        v-model="listQuery.importance"
-        placeholder="Imp"
-        clearable
-        style="width: 90px"
-        class="filter-item"
-      >
-        <el-option
-          v-for="item in importanceOptions"
-          :key="item"
-          :label="item"
-          :value="item"
-        />
-      </el-select>
 
       <el-select
         v-model="listQuery.sort"
@@ -45,15 +31,6 @@
         @click="handleFilter"
       >
         Search
-      </el-button>
-      <el-button
-        class="filter-item"
-        style="margin-left: 10px"
-        type="primary"
-        icon="el-icon-edit"
-        @click="handleCreate"
-      >
-        Add
       </el-button>
       <el-button
         v-waves
@@ -100,38 +77,39 @@
           <span>{{ row.bsid }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="病人名字"
-        width="80px"
-      >
+      <el-table-column label="病人名字" width="80px">
         <template slot-scope="{ row }">
           <span>{{ row.uname }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="床号"
-        width="80px"
-      >
+      <el-table-column label="床号" width="80px">
         <template slot-scope="{ row }">
           <span>{{ row.bid }}</span>
         </template>
       </el-table-column>
-            <el-table-column
-        label="地址"
-        min-width="80px"
-      >
+            <el-table-column label="入院日期" width="160px">
         <template slot-scope="{ row }">
-          <span>{{ row.address }}</span>
+          <span>{{ row.startdate }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="结束日期" width="160px">
+        <template slot-scope="{ row }">
+          <span>{{ row.enddate }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="地址" min-width="80px">
+        <template slot-scope="{ row }">
+          <span>{{ row.bedaddress }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Status" class-name="status-col" width="100">
-        <template slot-scope="{row}">
+        <template slot-scope="{ row }">
           <el-tag :type="row.type | statusFilter">
-            {{row.status}} 
+            {{ row.status }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         label="Actions"
         align="center"
         width="230"
@@ -165,7 +143,7 @@
             Delete
           </el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <!-- 分页栏 -->
     <pagination
@@ -186,7 +164,7 @@
         label-width="80px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="病床编号" prop="bid" >
+        <el-form-item label="病床编号" prop="bid">
           <el-input v-model="temp.bid" />
         </el-form-item>
         <el-form-item label="类型" prop="type">
@@ -251,12 +229,11 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
-
 let bedtype = [
-    {key:0,value:"静养"},
-    {key:1,value:"公共"},
-    {key:2,value:"重症"}
-]
+  { key: 0, value: "静养" },
+  { key: 1, value: "公共" },
+  { key: 2, value: "重症" },
+];
 export default {
   name: "BedTable",
   components: { Pagination },
@@ -405,25 +382,6 @@ export default {
         this.$refs["dataForm"].clearValidate();
       });
     },
-    // TAG 添加数据
-    createData() {
-      console.log("创建");
-      this.$refs["dataForm"].validate((valid) => {
-        if (valid) {
-          console.log("添加的科室请求信息", this.temp);
-          this.$axios.post("admin/addBed", this.temp).then((e) => {
-            this.list.unshift(e.data);
-            this.dialogFormVisible = false;
-            this.$notify({
-              title: "Success",
-              message: "Created Successfully",
-              type: "success",
-              duration: 2000,
-            });
-          });
-        }
-      });
-    },
     handleUpdate(row) {
       this.temp = Object.assign({}, row); // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp);
@@ -434,12 +392,12 @@ export default {
       });
     },
     updateData() {
-        console.log("更新部门");
+      console.log("更新部门");
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp);
           tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          this.$axios.post("/admin/updateBed",tempData).then(() => {
+          this.$axios.post("/admin/updateBed", tempData).then(() => {
             const index = this.list.findIndex((v) => v.id === this.temp.id);
             this.list.splice(index, 1, this.temp);
             this.dialogFormVisible = false;
@@ -454,10 +412,8 @@ export default {
       });
     },
     handleDelete(row, index) {
-      console.log("删除",row);
-      this.$axios.post("admin/deleteBed",row).then(e=>{
-
-      })
+      console.log("删除", row);
+      this.$axios.post("admin/deleteBed", row).then((e) => {});
       this.$notify({
         title: "Success",
         message: "Delete Successfully",
