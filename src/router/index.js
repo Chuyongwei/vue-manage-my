@@ -32,7 +32,66 @@ import VueRouter from 'vue-router'
  * all roles can be accessed
  */
 
-// TODO 添加导航栏
+// TAG 动态路由
+export const asyncRoutes = [{
+  path: '/patient',
+  component: Layout,
+  redirect: "/patient/subscribe",
+  meta: { title: "治疗病人", icon: "peoples", roles: ["doctor"] },
+  children: [
+    {
+      path: 'subscribe',
+      name: 'subscribe',
+      component: () => import("@/views/Subscribe/Subscribe.vue"),
+      meta: { title: '预约病人', icon: "Subscripe", roles: ["doctor"] }
+    },
+    {
+      path: 'inHospital',
+      name: 'inHospital',
+      component: () => import('@/views/Subscribe/InHospital.vue'),
+      meta: { title: '住院病人', roles: ["doctor"] }
+    },
+    {
+      path: "tracking",
+      name: "tracking",
+      component: () => import("@/views/Score/Tracking.vue"),
+      meta: { title: "跟踪病人", roles: ["doctor"] }
+    }
+
+  ]
+}, {
+  path: "/manager",
+  component: Layout,
+  meta: { title: '管理', icon: 'DataManager', roles: ["admin"] },
+  redirect: '/manager/department',
+  children: [
+    {
+      path: "doctor",
+      name: "doctor",
+      component: () => import("@/views/Doctor/Doctor.vue"),
+      meta: { title: "医生", icon: 'doctor', roles: ["admin"] }
+    },
+    {
+      path: "department",
+      name: "department",
+      component: () => import("@/views/Department/Department.vue"),
+      meta: {
+        title: "部门",
+        icon: "dashboard",
+        roles: ["admin"]
+      }
+    }, {
+      path: "bed",
+      name: "bed",
+      component: () => import("@/views/Bed/Bed.vue"),
+      meta: {
+        title: "病床管理",
+        roles: ["admin"]
+      }
+    }
+  ]
+}]
+
 // 这里的内容可从this.$router.options.routes
 export const constantRoutes = [
   {
@@ -46,7 +105,7 @@ export const constantRoutes = [
     component: () => import('@/views/404'),
     hidden: true
   },
-// 首页
+  // 首页
   {
     path: '/',
     component: Layout,
@@ -58,52 +117,25 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     },
 
-  ]
+    ]
   },
 
   {
-    path:"/score",
+    path: "/score",
     component: Layout,
-    meta:{title:"记录",},
-    children:[
+    meta: { title: "记录", },
+    children: [
       {
-        path:"bedscore",
-        name:"bedscore",
-        component:()=>import("@/views/Score/BedScore.vue"),
-        meta:{
-          title:"病床记录"
+        path: "bedscore",
+        name: "bedscore",
+        component: () => import("@/views/Score/BedScore.vue"),
+        meta: {
+          title: "病床记录"
         }
       }
     ]
   },
 
-  {
-    path: '/patient',
-    component: Layout,
-    redirect:"/patient/subscribe",
-    meta:{title:"治疗病人",icon:"peoples"},
-    children:[
-      {
-        path: 'subscribe',
-        name: 'subscribe',
-        component: ()=>import("@/views/Subscribe/Subscribe.vue"),
-        meta: {title:'预约病人',icon:"Subscripe"}
-      },
-      {
-        path: 'inHospital',
-        name: 'inHospital',
-        component: ()=>import('@/views/Subscribe/InHospital.vue'),
-        meta:{title:'住院病人'}
-      },
-      {
-        path: "tracking",
-        name:"tracking",
-        component:()=>import("@/views/Score/Tracking.vue"),
-        meta:{title:"跟踪病人"}
-      }
-
-    ]
-  },
   // TAG 编写不能写到导航栏中的路由
   // 使用 words.filter(word => word.length > 6);
 
@@ -129,83 +161,83 @@ export const constantRoutes = [
   //       name: "uploadreport",
   //       meta: {title:'提交检查报告'}
   //     }
-      
+
   //   ]
   // },
   //
 
 
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ]
-  },
+  // {
+  //   path: '/form',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Form',
+  //       component: () => import('@/views/form/index'),
+  //       meta: { title: 'Form', icon: 'form' }
+  //     }
+  //   ]
+  // },
 
-  {
-    path: '/nested',
-    component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
-    meta: {
-      title: 'Nested',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
-      },
-      {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        name: 'Menu2',
-        meta: { title: 'menu2' }
-      }
-    ]
-  },
+  // {
+  //   path: '/nested',
+  //   component: Layout,
+  //   redirect: '/nested/menu1',
+  //   name: 'Nested',
+  //   meta: {
+  //     title: 'Nested',
+  //     icon: 'nested'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'menu1',
+  //       component: () => import('@/views/nested/menu1/index'), // Parent router-view
+  //       name: 'Menu1',
+  //       meta: { title: 'Menu1' },
+  //       children: [
+  //         {
+  //           path: 'menu1-1',
+  //           component: () => import('@/views/nested/menu1/menu1-1'),
+  //           name: 'Menu1-1',
+  //           meta: { title: 'Menu1-1' }
+  //         },
+  //         {
+  //           path: 'menu1-2',
+  //           component: () => import('@/views/nested/menu1/menu1-2'),
+  //           name: 'Menu1-2',
+  //           meta: { title: 'Menu1-2' },
+  //           children: [
+  //             {
+  //               path: 'menu1-2-1',
+  //               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
+  //               name: 'Menu1-2-1',
+  //               meta: { title: 'Menu1-2-1' }
+  //             },
+  //             {
+  //               path: 'menu1-2-2',
+  //               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
+  //               name: 'Menu1-2-2',
+  //               meta: { title: 'Menu1-2-2' }
+  //             }
+  //           ]
+  //         },
+  //         {
+  //           path: 'menu1-3',
+  //           component: () => import('@/views/nested/menu1/menu1-3'),
+  //           name: 'Menu1-3',
+  //           meta: { title: 'Menu1-3' }
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       path: 'menu2',
+  //       component: () => import('@/views/nested/menu2/index'),
+  //       name: 'Menu2',
+  //       meta: { title: 'menu2' }
+  //     }
+  //   ]
+  // },
 
   {
     path: 'external-link',
@@ -213,7 +245,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        meta: { title: '外连接', icon: 'link' }
       }
     ]
   },
@@ -238,54 +270,4 @@ export function resetRouter() {
 
 export default router
 
-// TAG 动态路由
-export const asyncRoutes = [  {
-  path:"/manager",
-  component: Layout,
-  meta: { title: '管理', icon: 'DataManager' },
-  redirect: '/manager/department',
-  children:[
-    {
-      path:"doctor",
-      name:"doctor",
-      component:()=>import("@/views/Doctor/Doctor.vue"),
-      meta:{title:"医生",icon: 'doctor'}
-    },
-    {
-      path:"department",
-      name:"department",
-      component:()=>import("@/views/Department/Department.vue"),
-      meta:{
-        title: "部门",
-        icon:"dashboard"
-      }
-    },{
-      path:"bed",
-      name:"bed",
-      component:()=>import("@/views/Bed/Bed.vue"),
-      meta:{
-        title:"病床管理"
-      }
-    }
-  ]
-},{
-  path: '/example',
-  component: Layout,
-  redirect: '/example/table',
-  name: 'Example',
-  meta: { title: 'Example', icon: 'el-icon-s-help' },
-  children: [
-    {
-      path: 'table',
-      name: 'Table',
-      component: () => import('@/views/table/index'),
-      meta: { title: 'Table', icon: 'table' }
-    },
-    {
-      path: 'tree',
-      name: 'Tree',
-      component: () => import('@/views/tree/index'),
-      meta: { title: 'Tree', icon: 'tree' }
-    }
-  ]
-},]
+

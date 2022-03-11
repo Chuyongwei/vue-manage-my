@@ -97,7 +97,7 @@
         :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.bid }}</span>
+          <span>{{ row.bsid }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -110,10 +110,18 @@
       </el-table-column>
       <el-table-column
         label="床号"
-        min-width="80px"
+        width="80px"
       >
         <template slot-scope="{ row }">
           <span>{{ row.bid }}</span>
+        </template>
+      </el-table-column>
+            <el-table-column
+        label="地址"
+        min-width="80px"
+      >
+        <template slot-scope="{ row }">
+          <span>{{ row.address }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Status" class-name="status-col" width="100">

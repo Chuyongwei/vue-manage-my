@@ -6,7 +6,8 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    roles:[]
   }
 }
 
@@ -24,6 +25,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_ROLES: (state, roles) => {
+    state.roles = roles
   }
 }
 
@@ -53,14 +57,15 @@ const actions = {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(data => {
         // const { data } = response
-        console.log("data",data);
+        console.log("store获取的user",data);
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name } = data
+        const { name,roles } = data
 
         commit('SET_NAME', name)
+        commit('SET_ROLES', roles)
         // commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
