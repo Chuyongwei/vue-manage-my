@@ -5,7 +5,6 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
-import VueRouter from 'vue-router'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -36,14 +35,14 @@ import VueRouter from 'vue-router'
 export const asyncRoutes = [{
   path: '/patient',
   component: Layout,
-  redirect: "/patient/subscribe",
-  meta: { title: "治疗病人", icon: "patient", roles: ["doctor"] },
+  redirect: '/patient/subscribe',
+  meta: { title: '治疗病人', icon: 'patient', roles: ['doctor'] },
   children: [
     {
       path: 'subscribe',
       name: 'subscribe',
-      component: () => import("@/views/Subscribe/Subscribe.vue"),
-      meta: { title: '预约病人', icon: "Subscripe", roles: ["doctor"] }
+      component: () => import('@/views/Subscribe/Subscribe.vue'),
+      meta: { title: '预约病人', icon: 'Subscripe', roles: ['doctor'] }
     },
     {
       path: 'inHospital',
@@ -51,51 +50,51 @@ export const asyncRoutes = [{
       component: () => import('@/views/Subscribe/InHospital.vue'),
       meta: {
         title: '住院病人',
-        icon: "inHospital",
-        roles: ["doctor"]
+        icon: 'inHospital',
+        roles: ['doctor']
       }
     },
     {
-      path: "tracking",
-      name: "tracking",
-      component: () => import("@/views/Score/Tracking.vue"),
-      meta: { 
-        title: "跟踪病人",
-        icon: "trackScore", 
-        roles: ["doctor"],
-       }
+      path: 'tracking',
+      name: 'tracking',
+      component: () => import('@/views/Score/Tracking.vue'),
+      meta: {
+        title: '跟踪病人',
+        icon: 'trackScore',
+        roles: ['doctor']
+      }
     }
 
   ]
 }, {
-  path: "/manager",
+  path: '/manager',
   component: Layout,
-  meta: { title: '管理', icon: 'DataManager', roles: ["admin"] },
+  meta: { title: '管理', icon: 'DataManager', roles: ['admin'] },
   redirect: '/manager/department',
   children: [
     {
-      path: "doctor",
-      name: "doctor",
-      component: () => import("@/views/Doctor/Doctor.vue"),
-      meta: { title: "医生", icon: 'doctor', roles: ["admin"] }
+      path: 'doctor',
+      name: 'doctor',
+      component: () => import('@/views/Doctor/Doctor.vue'),
+      meta: { title: '医生', icon: 'doctor', roles: ['admin'] }
     },
     {
-      path: "department",
-      name: "department",
-      component: () => import("@/views/Department/Department.vue"),
+      path: 'department',
+      name: 'department',
+      component: () => import('@/views/Department/Department.vue'),
       meta: {
-        title: "部门",
-        icon: "dashboard",
-        roles: ["admin"]
+        title: '部门',
+        icon: 'dashboard',
+        roles: ['admin']
       }
     }, {
-      path: "bed",
-      name: "bed",
-      component: () => import("@/views/Bed/Bed.vue"),
+      path: 'bed',
+      name: 'bed',
+      component: () => import('@/views/Bed/Bed.vue'),
       meta: {
-        title: "病床管理",
+        title: '病床管理',
         icon: 'bed',
-        roles: ["admin"]
+        roles: ['admin']
       }
     }
   ]
@@ -124,23 +123,23 @@ export const constantRoutes = [
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
-    },
+    }
 
     ]
   },
 
   {
-    path: "/score",
+    path: '/score',
     component: Layout,
-    meta: { title: "记录", },
+    meta: { title: '记录' },
     children: [
       {
-        path: "bedscore",
-        name: "bedscore",
-        component: () => import("@/views/Score/BedScore.vue"),
+        path: 'bedscore',
+        name: 'bedscore',
+        component: () => import('@/views/Score/BedScore.vue'),
         meta: {
-          title: "病床记录",
-          icon: "score"
+          title: '病床记录',
+          icon: 'score'
         }
       }
     ]
@@ -158,7 +157,7 @@ export const constantRoutes = [
   //   children:[
   //     // HACK 可能需要添加查找的页面
   //     // XXX 子组件获取参数this.$route.params.id
-  //     // 
+  //     //
   //     {
   //       path: 'checkdetial',
   //       name: 'checkdetial',
@@ -175,7 +174,6 @@ export const constantRoutes = [
   //   ]
   // },
   //
-
 
   // {
   //   path: '/form',
@@ -279,5 +277,4 @@ export function resetRouter() {
 }
 
 export default router
-
 

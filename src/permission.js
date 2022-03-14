@@ -9,9 +9,8 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['/login'] // no redirect whitelist
 
-
 // TAG 路由守卫
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   // start progress bar
   NProgress.start()
 
@@ -20,7 +19,7 @@ router.beforeEach(async (to, from, next) => {
 
   // determine whether the user has logged in
   const hasToken = getToken()
-  console.log("守卫中的hasToken", hasToken);
+  console.log('守卫中的hasToken', hasToken)
   if (hasToken) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
@@ -33,10 +32,10 @@ router.beforeEach(async (to, from, next) => {
       } else {
         try {
           // get user info
-          let {roles} = await store.dispatch('user/getInfo')
-          const accessRoutes = await store.dispatch('permission/generateRoutes',roles)
+          const { roles } = await store.dispatch('user/getInfo')
+          const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
           router.addRoutes(accessRoutes)
-          
+
           next()
         } catch (error) {
           // remove token and go to login page to re-login

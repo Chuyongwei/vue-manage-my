@@ -7,7 +7,7 @@ const getDefaultState = () => {
     token: getToken(),
     name: '',
     avatar: '',
-    roles:[]
+    roles: []
   }
 }
 
@@ -39,9 +39,9 @@ const actions = {
     const { doctorid, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ doctorid: doctorid.trim(), password: password }).then(data => {
-        console.log("store接收的",userInfo);
+        console.log('store接收的', userInfo)
         // const { data } = response
-        console.log("store中的登录",data);
+        console.log('store中的登录', data)
         commit('SET_TOKEN', data.doctorid)
         setToken(data.doctorid)
         resolve()
@@ -53,16 +53,16 @@ const actions = {
 
   // get user info 这里的token就是医生的doctor——id号
   getInfo({ commit, state }) {
-    console.log("store",state);
+    console.log('store', state)
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(data => {
         // const { data } = response
-        console.log("store获取的user",data);
+        console.log('store获取的user', data)
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name,roles } = data
+        const { name, roles } = data
 
         commit('SET_NAME', name)
         commit('SET_ROLES', roles)

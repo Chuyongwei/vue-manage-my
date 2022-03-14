@@ -61,7 +61,7 @@ const actions = {
   },
   generateRoutes1({ commit }) {
     return new Promise(resolve => {
-      let accessedRoutes = asyncRoutes
+      const accessedRoutes = asyncRoutes
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })
