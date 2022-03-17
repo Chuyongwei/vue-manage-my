@@ -24,20 +24,6 @@
         />
       </el-select>
       <el-select
-        v-model="listQuery.type"
-        placeholder="Type"
-        clearable
-        class="filter-item"
-        style="width: 130px"
-      >
-        <el-option
-          v-for="item in calendarTypeOptions"
-          :key="item.key"
-          :label="item.display_name + '(' + item.key + ')'"
-          :value="item.key"
-        />
-      </el-select>
-      <el-select
         v-model="listQuery.sort"
         style="width: 140px"
         class="filter-item"
@@ -223,46 +209,6 @@
             v-model="temp.introduce"
           ></el-input>
         </el-form-item>
-        <el-form-item label="Date" prop="timestamp">
-          <el-date-picker
-            v-model="temp.timestamp"
-            type="datetime"
-            placeholder="Please pick a date"
-          />
-        </el-form-item>
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title" />
-        </el-form-item>
-        <el-form-item label="Status">
-          <el-select
-            v-model="temp.status"
-            class="filter-item"
-            placeholder="Please select"
-          >
-            <el-option
-              v-for="item in statusOptions"
-              :key="item"
-              :label="item"
-              :value="item"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Imp">
-          <el-rate
-            v-model="temp.importance"
-            :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-            :max="3"
-            style="margin-top: 8px"
-          />
-        </el-form-item>
-        <el-form-item label="Remark">
-          <el-input
-            v-model="temp.remark"
-            :autosize="{ minRows: 2, maxRows: 4 }"
-            type="textarea"
-            placeholder="Please input"
-          />
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false"> Cancel </el-button>
@@ -303,18 +249,9 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
-const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
 
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+
+
 
 export default {
   name: "DoctorTable",
@@ -348,7 +285,6 @@ export default {
         sort: "+id",
       },
       importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
       sortOptions: [
         { label: "ID Ascending", key: "+id" },
         { label: "ID Descending", key: "-id" },
@@ -489,12 +425,10 @@ export default {
     createData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
           console.log("添加医生的请求", this.temp);
           this.$axios.post("doctor/addDoctor", this.temp).then((e) => {
             let {data} = e;
-            this.temp.doctorid(e)
+            this.temp.doctorid=data.doctorid
             this.list.unshift(this.temp);
             this.dialogFormVisible = false;
             this.$notify({
@@ -536,6 +470,7 @@ export default {
       });
     },
     handleDelete(row, index) {
+      this.$axios.post("/doctor/deleteDoctor",row)
       this.$notify({
         title: "Success",
         message: "Delete Successfully",

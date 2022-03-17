@@ -31,7 +31,8 @@ import '@/permission' // permission control
 // Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 Vue.use(ElementUI)
-axios.defaults.baseURL = '/api'
+console.log('当前开发环境',process.env.NODE_ENV);
+axios.defaults.baseURL = process.env.NODE_ENV === 'development' ? '/api' : '/track-patient/api'
 Vue.prototype.$axios = axios
 Vue.config.productionTip = false
 

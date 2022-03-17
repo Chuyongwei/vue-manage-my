@@ -1,6 +1,8 @@
 import axios from 'axios'
 // axios.defaults.baseURL = 'http://192.168.137.241:8080/admin'
-axios.defaults.baseURL = '/api'
+axios.defaults.baseURL = process.env.NODE_ENV === 'development' ? '/api' : '/track-patient/api'
+// axios.defaults.baseURL = '/api'
+
 axios.defaults.withCredentials = true
 // axios.defaults.headers['Content-Type']='application/json'
 const service = axios.create({

@@ -24,7 +24,7 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: process.env.NODE_ENV === 'development'?'/':"track-patient",
+  publicPath: process.env.NODE_ENV === 'development'?'/':"/track-patient",
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
@@ -40,6 +40,7 @@ module.exports = {
       '/api': {
         target: 'http://localhost:8085/',
         changeOrigin: true,
+        logLevel: 'debug',
         pathRewrite: {
           '^/api': ''
         },
