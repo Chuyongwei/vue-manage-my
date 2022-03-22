@@ -4,39 +4,30 @@
     <div class="filter-container">
       <el-input
         v-model="listQuery.title"
-        placeholder="Title"
+        placeholder="无效的窗口"
         style="width: 200px"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-select
-        v-model="listQuery.importance"
-        placeholder="Imp"
+        v-model="listQuery.type"
+        placeholder="类型"
         clearable
         style="width: 90px"
         class="filter-item"
       >
         <el-option
-          v-for="item in importanceOptions"
-          :key="item"
-          :label="item"
-          :value="item"
-        />
-      </el-select>
-
-      <el-select
-        v-model="listQuery.sort"
-        style="width: 140px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in sortOptions"
+          v-for="item in bedtype"
           :key="item.key"
-          :label="item.label"
-          :value="item.key"
+          :label="item.value"
+          :value="item.value"
         />
       </el-select>
+      <el-radio-group v-model="listQuery.showPatient" @change="handleShow" >
+        <el-radio-button label="显示全部" ></el-radio-button>
+        <el-radio-button label="显示有病人的床位" ></el-radio-button>
+        <el-radio-button label="显示没有病人的床位" ></el-radio-button>
+      </el-radio-group>
       <el-button
         v-waves
         class="filter-item"
@@ -44,7 +35,7 @@
         icon="el-icon-search"
         @click="handleFilter"
       >
-        Search
+        搜索
       </el-button>
       <el-button
         class="filter-item"
@@ -53,7 +44,7 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        Add
+        添加床位
       </el-button>
       <el-button
         v-waves
@@ -63,7 +54,7 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        Export
+        导出
       </el-button>
       <el-checkbox
         v-model="showReviewer"
@@ -100,26 +91,20 @@
           <span>{{ row.bid }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="病人名字"
-        width="80px"
-      >
+      <el-table-column label="病人名字" width="80px">
         <template slot-scope="{ row }">
           <span>{{ row.uname }}</span>
         </template>
       </el-table-column>
-      <el-table-column
-        label="地址"
-        min-width="80px"
-      >
+      <el-table-column label="地址" min-width="80px">
         <template slot-scope="{ row }">
           <span>{{ row.address }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Status" class-name="status-col" width="100">
-        <template slot-scope="{row}">
+        <template slot-scope="{ row }">
           <el-tag :type="row.type | statusFilter">
-            {{row.type}} 
+            {{ row.type }}
           </el-tag>
         </template>
       </el-table-column>
@@ -131,22 +116,7 @@
       >
         <template slot-scope="{ row, $index }">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
-          </el-button>
-          <el-button
-            v-if="row.status != 'published'"
-            size="mini"
-            type="success"
-            @click="handleModifyStatus(row, 'published')"
-          >
-            Publish
-          </el-button>
-          <el-button
-            v-if="row.status != 'draft'"
-            size="mini"
-            @click="handleModifyStatus(row, 'draft')"
-          >
-            Draft
+            编辑
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
@@ -154,7 +124,7 @@
             type="danger"
             @click="handleDelete(row, $index)"
           >
-            Delete
+            删除
           </el-button>
         </template>
       </el-table-column>
@@ -178,7 +148,7 @@
         label-width="80px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="病床编号" prop="bid" >
+        <el-form-item label="病床编号" prop="bid">
           <el-input v-model="temp.bid" />
         </el-form-item>
         <el-form-item label="类型" prop="type">
@@ -243,12 +213,11 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
-
 let bedtype = [
-    {key:0,value:"静养"},
-    {key:1,value:"公共"},
-    {key:2,value:"重症"}
-]
+  { key: 0, value: "静养" },
+  { key: 1, value: "公共" },
+  { key: 2, value: "重症" },
+];
 export default {
   name: "DepartmentTable",
   components: { Pagination },
@@ -284,24 +253,17 @@ export default {
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 20,
-        importance: undefined,
+        limit: 10,
         title: undefined,
         type: undefined,
         sort: "+id",
       },
-      importanceOptions: [1, 2, 3],
-      sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
-      ],
       statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
         departmentname: "",
         introduce: "",
         id: undefined,
-        importance: 1,
         remark: "",
         timestamp: new Date(),
         title: "",
@@ -357,13 +319,6 @@ export default {
       this.listQuery.page = 1;
       this.getList();
     },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
-    },
     sortChange(data) {
       const { prop, order } = data;
       if (prop === "id") {
@@ -381,7 +336,6 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
-        importance: 1,
         remark: "",
         timestamp: new Date(),
         title: "",
@@ -426,12 +380,12 @@ export default {
       });
     },
     updateData() {
-        console.log("更新部门");
+      console.log("更新部门");
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp);
           tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          this.$axios.post("/admin/updateBed",tempData).then(() => {
+          this.$axios.post("/admin/updateBed", tempData).then(() => {
             const index = this.list.findIndex((v) => v.id === this.temp.id);
             this.list.splice(index, 1, this.temp);
             this.dialogFormVisible = false;
@@ -445,11 +399,13 @@ export default {
         }
       });
     },
+    handleShow(e){
+      // console.log(e);
+      this.getList()
+    },
     handleDelete(row, index) {
-      console.log("删除",row);
-      this.$axios.post("admin/deleteBed",row).then(e=>{
-
-      })
+      console.log("删除", row);
+      this.$axios.post("admin/deleteBed", row).then((e) => {});
       this.$notify({
         title: "Success",
         message: "Delete Successfully",
@@ -467,13 +423,12 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["timestamp", "title", "type", "importance", "status"];
+        const tHeader = ["病床编号", "病人姓名", "地址", "类型"];
         const filterVal = [
-          "timestamp",
-          "title",
+          "bid",
+          "uname",
+          "address",
           "type",
-          "importance",
-          "status",
         ];
         const data = this.formatJson(filterVal);
         excel.export_json_to_excel({
@@ -485,6 +440,11 @@ export default {
       });
     },
     formatJson(filterVal) {
+      let pushlist = {};
+      Object.assign(pushlist, this.listQuery);
+      pushlist.limit = null;
+      // TODO 导出数据要修改
+      // this.$axios.post("/admin/checkBedbypage", this.listQuery);
       return this.list.map((v) =>
         filterVal.map((j) => {
           if (j === "timestamp") {

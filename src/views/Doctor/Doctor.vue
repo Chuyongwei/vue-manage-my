@@ -3,39 +3,27 @@
     <!-- 筛选栏 -->
     <div class="filter-container">
       <el-input
-        v-model="listQuery.title"
-        placeholder="Title"
+        v-model="listQuery.name"
+        placeholder="医生姓名"
         style="width: 200px"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-select
-        v-model="listQuery.importance"
-        placeholder="Imp"
+        v-model="listQuery.departmentid"
+        placeholder="科室名称"
         clearable
-        style="width: 90px"
+        style="width: 120px"
         class="filter-item"
       >
         <el-option
-          v-for="item in importanceOptions"
-          :key="item"
-          :label="item"
-          :value="item"
+          v-for="item in departments"
+          :key="item.departmentid"
+          :label="item.departmentname"
+          :value="item.departmentid"
         />
       </el-select>
-      <el-select
-        v-model="listQuery.sort"
-        style="width: 140px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in sortOptions"
-          :key="item.key"
-          :label="item.label"
-          :value="item.key"
-        />
-      </el-select>
+
       <el-button
         v-waves
         class="filter-item"
@@ -43,7 +31,7 @@
         icon="el-icon-search"
         @click="handleFilter"
       >
-        Search
+        搜索
       </el-button>
       <el-button
         class="filter-item"
@@ -52,7 +40,7 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        Add
+        添加医生
       </el-button>
       <el-button
         v-waves
@@ -62,7 +50,7 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        Export
+        导出图表
       </el-button>
       <el-checkbox
         v-model="showReviewer"
@@ -133,30 +121,14 @@
       >
         <template slot-scope="{ row, $index }">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+            编辑
           </el-button>
           <el-button
-            v-if="row.status != 'published'"
-            size="mini"
-            type="success"
-            @click="handleModifyStatus(row, 'published')"
-          >
-            Publish
-          </el-button>
-          <el-button
-            v-if="row.status != 'draft'"
-            size="mini"
-            @click="handleModifyStatus(row, 'draft')"
-          >
-            Draft
-          </el-button>
-          <el-button
-            v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
             @click="handleDelete(row, $index)"
           >
-            Delete
+            删除
           </el-button>
         </template>
       </el-table-column>
@@ -216,7 +188,7 @@
           type="primary"
           @click="dialogStatus === 'create' ? createData() : updateData()"
         >
-          Confirm
+          提交
         </el-button>
       </div>
     </el-dialog>
@@ -285,10 +257,6 @@ export default {
         sort: "+id",
       },
       importanceOptions: [1, 2, 3],
-      sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
-      ],
       statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
@@ -315,16 +283,8 @@ export default {
         departmentid: [
           { required: true, message: "请选择活动区域", trigger: "change" },
         ],
-        // timestamp: [
-        //   {
-        //     type: "date",
-        //     required: true,
-        //     message: "timestamp is required",
-        //     trigger: "change",
-        //   },
-        // ],
         name: [
-          { required: true, message: "title is required", trigger: "blur" },
+          { required: true, message: "名称必须有", trigger: "blur" },
         ],
         position: [{ required: true, message: "职位必须有", trigger: "blur" }],
       },
@@ -343,9 +303,6 @@ export default {
         .then((e) => {
           console.log("department接收数据", e.data);
           let { data } = e;
-          // this.departments=data.map(e=>{
-          //   return e.departmentname
-          // })
           this.departments = data;
         })
         .then(() => {
@@ -479,12 +436,6 @@ export default {
       });
       this.list.splice(index, 1);
     },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
-    },
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
@@ -509,6 +460,11 @@ export default {
     // TAG 添加excel的导入规则
     formatJson(filterVal) {
       // TODO 修改导出excel规则，应该使用全部信息的接口的数据
+      let pushlist ={} ;
+      Object.assign(pushlist,this.listQuery)
+      pushlist.limit = null;
+      console.log("准备导出的筛选数据",this.listQuery);
+      // this.$axios.post("",)
       return this.list.map((v) =>
         filterVal.map((j) => {
           if (j === "timestamp") {
