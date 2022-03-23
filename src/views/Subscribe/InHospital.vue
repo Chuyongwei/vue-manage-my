@@ -3,35 +3,28 @@
     <!-- 筛选栏 -->
     <div class="filter-container">
       <el-input
-        v-model="listQuery.title"
-        placeholder="Title"
+        v-model="listQuery.uname"
+        placeholder="名字"
         style="width: 200px"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-select
-        v-model="listQuery.importance"
-        placeholder="Imp"
+        v-model="listQuery.type"
+        placeholder="住院类型"
         clearable
-        style="width: 90px"
+        style="width: 120px"
         class="filter-item"
+        @change="getList"
       >
         <el-option
-          v-for="item in importanceOptions"
-          :key="item"
-          :label="item"
-          :value="item"
+          v-for="item in bedtype"
+          :key="item.index"
+          :label="item.value"
+          :value="item.index"
         />
       </el-select>
-      <el-select
-        v-model="listQuery.type"
-        placeholder="Type"
-        clearable
-        class="filter-item"
-        style="width: 130px"
-      >
-      </el-select>
-      <el-select
+      <!-- <el-select
         v-model="listQuery.sort"
         style="width: 140px"
         class="filter-item"
@@ -43,7 +36,7 @@
           :label="item.label"
           :value="item.key"
         />
-      </el-select>
+      </el-select> -->
       <el-button
         v-waves
         class="filter-item"
@@ -51,17 +44,17 @@
         icon="el-icon-search"
         @click="handleFilter"
       >
-        Search
+        搜索
       </el-button>
-      <el-button
+      <!-- <el-button
         class="filter-item"
         style="margin-left: 10px"
         type="primary"
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        Add
-      </el-button>
+        添加
+      </el-button> -->
       <el-button
         v-waves
         :loading="downloadLoading"
@@ -70,7 +63,7 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        Export
+        导出
       </el-button>
       <el-checkbox
         v-model="showReviewer"
@@ -452,8 +445,9 @@ export default {
       // TAG 获取数据
       let requiredata = { ...this.$store.state.user };
       requiredata.doctorid = requiredata.token;
-      console.log("获取住院病人", this.$store.state.user);
-      this.$axios.post("/doctor/inHospital", requiredata).then((e) => {
+      Object.assign(this.listQuery,requiredata)
+      console.log("获取住院病人", this.listQuery);
+      this.$axios.post("/doctor/inHospital", this.listQuery).then((e) => {
         console.log("inHospital", e.data);
         let { data } = e;
         this.list = data.items;

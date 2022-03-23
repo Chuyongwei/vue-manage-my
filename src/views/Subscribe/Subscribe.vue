@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <!-- 筛选栏 -->
-    <div class="filter-container">
+    <!--     <div class="filter-container">
       <el-input
         v-model="listQuery.title"
         placeholder="Title"
@@ -54,15 +54,6 @@
         Search
       </el-button>
       <el-button
-        class="filter-item"
-        style="margin-left: 10px"
-        type="primary"
-        icon="el-icon-edit"
-        @click="handleCreate"
-      >
-        Add
-      </el-button>
-      <el-button
         v-waves
         :loading="downloadLoading"
         class="filter-item"
@@ -72,15 +63,8 @@
       >
         Export
       </el-button>
-      <el-checkbox
-        v-model="showReviewer"
-        class="filter-item"
-        style="margin-left: 15px"
-        @change="tableKey = tableKey + 1"
-      >
-        reviewer
-      </el-checkbox>
-    </div>
+
+    </div> -->
 
     <!-- 表格 -->
     <el-table
@@ -135,14 +119,18 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row, $index }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
-          </el-button>
           <el-button
+            type="success"
+            size="mini"
+            @click="handleUpdate(row)"
+          >
+            诊断
+          </el-button>
+          <!-- <el-button
             v-if="row.status != 'published'"
             size="mini"
             type="success"
-            @click="handleModifyStatus(row, 'published')"
+            @click="handleUpdate(row, 'published')"
           >
             Publish
           </el-button>
@@ -152,7 +140,7 @@
             @click="handleModifyStatus(row, 'draft')"
           >
             Draft
-          </el-button>
+          </el-button> -->
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
@@ -435,13 +423,6 @@ export default {
       this.listQuery.page = 1;
       this.getList();
     },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
-    },
     sortChange(data) {
       const { prop, order } = data;
       if (prop === "id") {
@@ -463,14 +444,6 @@ export default {
         name: "",
         departmentname: "",
       };
-    },
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
     },
     createData() {
       this.$refs["dataForm"].validate((valid) => {

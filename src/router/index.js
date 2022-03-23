@@ -252,7 +252,7 @@ export const constantRoutes = [
     component: Layout,
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
+        path: process.env.NODE_ENV === 'development' ?"http://localhost:3000/":'https://panjiachen.github.io/vue-element-admin-site/#/',
         meta: { title: '外连接', icon: 'link' }
       }
     ]

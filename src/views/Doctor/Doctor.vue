@@ -243,6 +243,10 @@ export default {
     },
   },
   data() {
+    var checkDeparmentId = function(rules,value,callback){
+      if(value==0){return callback(new Error("选择科室"))}
+      callback()
+    }
     return {
       tableKey: 0,
       list: null,
@@ -251,8 +255,7 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        importance: undefined,
-        title: undefined,
+        departmentid: 0,
         type: undefined,
         sort: "+id",
       },
@@ -270,7 +273,7 @@ export default {
         status: "published",
       },
       // 部门集合
-      departments: [],
+      departments: [{departmentid:0,departmentname:"全部科室"}],
       dialogFormVisible: false,
       dialogStatus: "",
       textMap: {
@@ -281,7 +284,8 @@ export default {
       pvData: [],
       rules: {
         departmentid: [
-          { required: true, message: "请选择活动区域", trigger: "change" },
+          { required: true, message: "请选择科室", trigger: "change" },
+           { validator: checkDeparmentId, trigger: 'change' }
         ],
         name: [
           { required: true, message: "名称必须有", trigger: "blur" },
@@ -303,7 +307,7 @@ export default {
         .then((e) => {
           console.log("department接收数据", e.data);
           let { data } = e;
-          this.departments = data;
+          this.departments.push(...data);
         })
         .then(() => {
           this.$axios.post("/doctor/check", this.listQuery).then((response) => {
@@ -362,11 +366,7 @@ export default {
         name: "",
         departmentname: "",
         id: undefined,
-        importance: 1,
         position: "",
-        remark: "",
-        timestamp: new Date(),
-        title: "",
         status: "published",
         type: "",
       };
