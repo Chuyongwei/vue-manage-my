@@ -10,6 +10,20 @@
         @keyup.enter.native="handleFilter"
       />
       <el-select
+        v-model="listQuery.departmentid"
+        placeholder="科室"
+        clearable
+        style="width: 90px"
+        class="filter-item"
+      >
+        <el-option
+          v-for="item in departments"
+          :key="item.departmentid"
+          :label="item.departmentname"
+          :value="item.departmentid"
+        />
+      </el-select>
+      <el-select
         v-model="listQuery.type"
         placeholder="类型"
         clearable
@@ -23,10 +37,10 @@
           :value="item.value"
         />
       </el-select>
-      <el-radio-group v-model="listQuery.showPatient" @change="handleShow" >
-        <el-radio-button label="显示全部" ></el-radio-button>
-        <el-radio-button label="显示有病人的床位" ></el-radio-button>
-        <el-radio-button label="显示没有病人的床位" ></el-radio-button>
+      <el-radio-group v-model="listQuery.showPatient" @change="handleShow">
+        <el-radio-button label="显示全部"></el-radio-button>
+        <el-radio-button label="显示有病人的床位"></el-radio-button>
+        <el-radio-button label="显示没有病人的床位"></el-radio-button>
       </el-radio-group>
       <el-button
         v-waves
@@ -96,6 +110,11 @@
           <span>{{ row.uname }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="所属科室" width="80px">
+        <template slot-scope="{ row }">
+          <span>{{ row.departmentname }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="地址" min-width="80px">
         <template slot-scope="{ row }">
           <span>{{ row.address }}</span>
@@ -151,36 +170,56 @@
         <el-form-item label="病床编号" prop="bid">
           <el-input v-model="temp.bid" />
         </el-form-item>
-        <el-form-item label="类型" prop="type">
+        <el-form-item label="类型" prop="type" >
           <el-select
             v-model="temp.type"
             class="filter-item"
-            placeholder="Please select"
+            placeholder="选择病床的类型"
           >
             <el-option
               v-for="item in bedtype"
               :key="item.key"
               :label="item.value"
               :value="item.value"
+              class="filter-item"
+              placeholder="Please select"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="地址">
+        <el-form-item
+          label="所属科室"
+          class="filter-item"
+          placeholder="这个床是哪个科室"
+          prop="departmentid"
+        >
+          <el-select v-model="temp.departmentid">
+            <el-option
+              v-for="item in departments"
+              :key="item.departmentid"
+              :label="item.departmentname"
+              :value="item.departmentid"
+              class="filter-item"
+              placeholder="Please select"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="地址" prop="address">
           <el-input
             v-model="temp.address"
             :autosize="{ minRows: 2, maxRows: 4 }"
             type="textarea"
-            placeholder="Please input"
+            placeholder="输入病床的位置"
           />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
+        <el-button @click="dialogFormVisible = false"> 返回 </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? createData() : updateData()"
         >
-          Confirm
+          提交
         </el-button>
       </div>
     </el-dialog>
@@ -236,15 +275,6 @@ export default {
     },
   },
   data() {
-    let validateIntroduce = (rule, value, callback) => {
-      if (!value) {
-        callback("科室的介绍必须有");
-      }
-      if (value.length > 50) {
-        callback("科室的介绍超过50字");
-      }
-      callback();
-    };
 
     return {
       tableKey: 0,
@@ -261,18 +291,15 @@ export default {
       statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
-        departmentname: "",
-        introduce: "",
-        id: undefined,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
+        departmentid: "",
+        bid: undefined,
+        address: "",
         type: "",
-        status: "published",
       },
       dialogFormVisible: false,
       dialogStatus: "",
       bedtype,
+      departments: [{}],
       //   业务 表现名
       textMap: {
         update: "更新",
@@ -281,20 +308,30 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        departmentname: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
+        departmentid: [
+          { required: true, message: "请选择科室", trigger: "change" },
         ],
-        introduce: [
-          {
-            validator: validateIntroduce,
-            trigger: "blur",
-          },
+        address: [
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
         ],
+        type:[
+          {required:true,message:"输入病床类型",trigger:"change"}
+        ]
+        // introduce: [
+        //   {
+        //     validator: validateIntroduce,
+        //     trigger: "blur",
+        //   },
+        // ],
       },
       downloadLoading: false,
     };
   },
   mounted() {
+    this.$axios.post("/admin/checkdepartmentby", this.listQuery).then((e) => {
+      console.log(e);
+      this.departments = e.data.items;
+    });
     this.getList();
   },
   methods: {
@@ -336,10 +373,8 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
+        departmentid: "",
+        address: "",
         type: "",
       };
     },
@@ -358,7 +393,9 @@ export default {
         if (valid) {
           console.log("添加的科室请求信息", this.temp);
           this.$axios.post("admin/addBed", this.temp).then((e) => {
-            this.list.unshift(e.data);
+            let newbed  =  e.data
+            newbed.departmentname = this.departments.filter((v)=>v.departmentid == newbed.departmentid)[0].departmentname
+            this.list.unshift(newbed);
             this.dialogFormVisible = false;
             this.$notify({
               title: "Success",
@@ -399,9 +436,9 @@ export default {
         }
       });
     },
-    handleShow(e){
+    handleShow(e) {
       // console.log(e);
-      this.getList()
+      this.getList();
     },
     handleDelete(row, index) {
       console.log("删除", row);
@@ -424,12 +461,7 @@ export default {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
         const tHeader = ["病床编号", "病人姓名", "地址", "类型"];
-        const filterVal = [
-          "bid",
-          "uname",
-          "address",
-          "type",
-        ];
+        const filterVal = ["bid", "uname", "address", "type"];
         const data = this.formatJson(filterVal);
         excel.export_json_to_excel({
           header: tHeader,

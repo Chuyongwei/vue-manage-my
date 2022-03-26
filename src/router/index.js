@@ -66,7 +66,8 @@ export const asyncRoutes = [{
     }
 
   ]
-}, {
+},
+{
   path: '/manager',
   component: Layout,
   meta: { title: '管理', icon: 'DataManager', roles: ['admin'] },
@@ -87,7 +88,8 @@ export const asyncRoutes = [{
         icon: 'dashboard',
         roles: ['admin']
       }
-    }, {
+    },
+    {
       path: 'bed',
       name: 'bed',
       component: () => import('@/views/Bed/Bed.vue'),
@@ -96,9 +98,23 @@ export const asyncRoutes = [{
         icon: 'bed',
         roles: ['admin']
       }
-    }
+    },
   ]
-}]
+},
+{
+  path: '/ma',
+  component: Layout,
+  redirect: '/ma/updatepwd',
+  children: [
+    {
+      path: 'updatepwd',
+      name: 'updatepwd',
+      component: () => import('@/views/UpdatePwd.vue'),
+      meta: { title: '修改密码', icon: 'doctor', roles: ['doctor'] }
+    },
+  ]
+}
+]
 
 // 这里的内容可从this.$router.options.routes
 export const constantRoutes = [
@@ -252,7 +268,7 @@ export const constantRoutes = [
     component: Layout,
     children: [
       {
-        path: process.env.NODE_ENV === 'development' ?"http://localhost:3000/":'https://panjiachen.github.io/vue-element-admin-site/#/',
+        path: process.env.NODE_ENV === 'development' ? "http://localhost:3000/" : 'https://panjiachen.github.io/vue-element-admin-site/#/',
         meta: { title: '外连接', icon: 'link' }
       }
     ]
