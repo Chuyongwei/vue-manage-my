@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-      <!-- 筛选栏 -->
+    <!-- 筛选栏 -->
     <div class="filter-container">
       <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
@@ -37,8 +37,8 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-    <!-- NOTE 在列中设置sortable属性即可实现以该列为基准的排序 设置为custom 就是有后端排序 -->
-    <!-- NOTE slot-scope设置行中的项的名字 -->
+      <!-- NOTE 在列中设置sortable属性即可实现以该列为基准的排序 设置为custom 就是有后端排序 -->
+      <!-- NOTE slot-scope设置行中的项的名字 -->
       <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>

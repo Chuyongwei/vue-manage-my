@@ -175,11 +175,11 @@
         </el-form-item>
         <el-form-item label="介绍" prop="introduce">
           <el-input
+            v-model="temp.introduce"
             type="textarea"
             :rows="2"
             placeholder="请输入内容"
-            v-model="temp.introduce"
-          ></el-input>
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -206,9 +206,10 @@
         <el-table-column prop="pv" label="Pv" />
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false"
-          >Confirm</el-button
-        >
+        <el-button
+          type="primary"
+          @click="dialogPvVisible = false"
+        >Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -217,34 +218,30 @@
 <script>
 // TAG api
 // import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-
-
-
-
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  name: "DoctorTable",
+  name: 'DoctorTable',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
-    var checkDeparmentId = function(rules,value,callback){
-      if(value==0){return callback(new Error("选择科室"))}
+    var checkDeparmentId = function(rules, value, callback) {
+      if (value == 0) { return callback(new Error('选择科室')) }
       callback()
     }
     return {
@@ -257,228 +254,228 @@ export default {
         limit: 20,
         departmentid: 0,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         departmentname: {},
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       // 部门集合
-      departments: [{departmentid:0,departmentname:"全部科室"}],
+      departments: [{ departmentid: 0, departmentname: '全部科室' }],
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
         departmentid: [
-          { required: true, message: "请选择科室", trigger: "change" },
-           { validator: checkDeparmentId, trigger: 'change' }
+          { required: true, message: '请选择科室', trigger: 'change' },
+          { validator: checkDeparmentId, trigger: 'change' }
         ],
         name: [
-          { required: true, message: "名称必须有", trigger: "blur" },
+          { required: true, message: '名称必须有', trigger: 'blur' }
         ],
-        position: [{ required: true, message: "职位必须有", trigger: "blur" }],
+        position: [{ required: true, message: '职位必须有', trigger: 'blur' }]
       },
-      downloadLoading: false,
-    };
+      downloadLoading: false
+    }
   },
   created() {
-    this.getList();
+    this.getList()
   },
   methods: {
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       // TAG 获取数据
       this.$axios
-        .get("/doctor/checkDeparment")
+        .get('/doctor/checkDeparment')
         .then((e) => {
-          console.log("department接收数据", e.data);
-          let { data } = e;
-          this.departments.push(...data);
+          console.log('department接收数据', e.data)
+          const { data } = e
+          this.departments.push(...data)
         })
         .then(() => {
-          this.$axios.post("/doctor/check", this.listQuery).then((response) => {
-            this.list = response.data.items;
-            this.total = response.data.total;
-            console.log("doctor接收的数据", this.list);
-            let departments = this.departments;
+          this.$axios.post('/doctor/check', this.listQuery).then((response) => {
+            this.list = response.data.items
+            this.total = response.data.total
+            console.log('doctor接收的数据', this.list)
+            const departments = this.departments
             this.list.map((l) => {
-              let department = departments.filter(
+              const department = departments.filter(
                 (e) => e.departmentid == l.departmentid
-              );
+              )
               if (department.length == 0) {
-                l.departmentname = "";
+                l.departmentname = ''
               } else {
-                l.departmentname = department[0].departmentname;
+                l.departmentname = department[0].departmentname
               }
               // console.log(l.departmentname[0]["departmentname"]);
               // departments.filters(e=>e.departm/entid==1)
-            });
+            })
             // Just to simulate the time of the request
             setTimeout(() => {
-              this.listLoading = false;
-            }, 1.5 * 1000);
-          });
-        });
+              this.listLoading = false
+            }, 1.5 * 1000)
+          })
+        })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
         doctorid: 0,
-        introduce: "",
-        name: "",
-        departmentname: "",
+        introduce: '',
+        name: '',
+        departmentname: '',
         id: undefined,
-        position: "",
-        status: "published",
-        type: "",
-      };
+        position: '',
+        status: 'published',
+        type: ''
+      }
     },
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     createData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log("添加医生的请求", this.temp);
-          this.$axios.post("doctor/addDoctor", this.temp).then((e) => {
-            let {data} = e;
-            this.temp.doctorid=data.doctorid
-            this.list.unshift(this.temp);
-            this.dialogFormVisible = false;
+          console.log('添加医生的请求', this.temp)
+          this.$axios.post('doctor/addDoctor', this.temp).then((e) => {
+            const { data } = e
+            this.temp.doctorid = data.doctorid
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
             this.$notify({
-              title: "Success",
-              message: "Created Successfully",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: 'Success',
+              message: 'Created Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          this.$axios.post("/doctor/updateDoctor",tempData).then(() => {
-            const index = this.list.findIndex((v) => v.doctorid === this.temp.doctorid);
-            this.list.splice(index, 1, this.temp);
-            this.dialogFormVisible = false;
+          const tempData = Object.assign({}, this.temp)
+          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          this.$axios.post('/doctor/updateDoctor', tempData).then(() => {
+            const index = this.list.findIndex((v) => v.doctorid === this.temp.doctorid)
+            this.list.splice(index, 1, this.temp)
+            this.dialogFormVisible = false
             this.$notify({
-              title: "Success",
-              message: "Update Successfully",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: 'Success',
+              message: 'Update Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleDelete(row, index) {
-      this.$axios.post("/doctor/deleteDoctor",row)
+      this.$axios.post('/doctor/deleteDoctor', row)
       this.$notify({
-        title: "Success",
-        message: "Delete Successfully",
-        type: "success",
-        duration: 2000,
-      });
-      this.list.splice(index, 1);
+        title: 'Success',
+        message: 'Delete Successfully',
+        type: 'success',
+        duration: 2000
+      })
+      this.list.splice(index, 1)
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["医生编号", "医生名字", "所属科室", "职位", "介绍"];
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['医生编号', '医生名字', '所属科室', '职位', '介绍']
         const filterVal = [
-          "doctorid",
-          "name",
-          "departmentname",
-          "position",
-          "introduce",
-        ];
-        const data = this.formatJson(filterVal);
-          // console.log("dian");
+          'doctorid',
+          'name',
+          'departmentname',
+          'position',
+          'introduce'
+        ]
+        const data = this.formatJson(filterVal)
+        // console.log("dian");
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "table-list",
-        });
-        this.downloadLoading = false;
-      });
+          filename: 'table-list'
+        })
+        this.downloadLoading = false
+      })
     },
     // TAG 添加excel的导入规则
     formatJson(filterVal) {
       // TODO 修改导出excel规则，应该使用全部信息的接口的数据
-      let pushlist ={} ;
-      Object.assign(pushlist,this.listQuery)
-      pushlist.limit = null;
-      console.log("准备导出的筛选数据",this.listQuery);
+      const pushlist = {}
+      Object.assign(pushlist, this.listQuery)
+      pushlist.limit = null
+      console.log('准备导出的筛选数据', this.listQuery)
       // this.$axios.post("",)
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>

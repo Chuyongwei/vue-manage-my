@@ -133,10 +133,10 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row, $index }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button type="primary" size="mini" @click="handleUpdate(row,$index)">
             Edit
           </el-button>
-          <el-button
+          <!--           <el-button
             v-if="row.status != 'published'"
             size="mini"
             type="success"
@@ -150,15 +150,7 @@
             @click="handleModifyStatus(row, 'draft')"
           >
             Draft
-          </el-button>
-          <el-button
-            v-if="row.status != 'deleted'"
-            size="mini"
-            type="danger"
-            @click="handleDelete(row, $index)"
-          >
-            Delete
-          </el-button>
+          </el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -196,24 +188,24 @@
               :key="item.index"
               :label="item.value"
               :value="item.value"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="症状" prop="symptoms">
           <el-input
+            v-model="temp.symptoms"
             type="textarea"
             :rows="2"
             placeholder="请输入内容"
-            v-model="temp.symptoms"
-          ></el-input>
+          />
         </el-form-item>
         <el-form-item label="处方" prop="prescription">
           <el-input
+            v-model="temp.prescription"
             type="textarea"
             :rows="2"
             placeholder="请输入内容"
-            v-model="temp.prescription"
-          ></el-input>
+          />
         </el-form-item>
         <!-- TAG 是否要跟踪 -->
         <template v-if="isTrack">
@@ -224,8 +216,7 @@
               type="date"
               placeholder="选择日期"
               :picker-options="pickerOptions"
-            >
-            </el-date-picker>
+            />
           </el-form-item>
           <el-form-item label="跟踪地址" prop="trackaddress">
             <el-input v-model="temp.trackaddress" placeholder="请输入地址" />
@@ -244,18 +235,18 @@
                 :key="item.index"
                 :label="item.value"
                 :value="item.value"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
         </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
+        <el-button @click="dialogFormVisible = false"> 返回 </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? createData() : updateData()"
         >
-          Confirm
+          提交
         </el-button>
       </div>
     </el-dialog>
@@ -273,9 +264,10 @@
         <el-table-column prop="pv" label="Pv" />
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false"
-          >Confirm</el-button
-        >
+        <el-button
+          type="primary"
+          @click="dialogPvVisible = false"
+        >Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -284,86 +276,72 @@
 <script>
 // TAG api
 // import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  name: "InhopitalTable",
+  name: 'InhopitalTable',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
-  },
-  watch: {
-    "temp.state"() {
-      this.isTransfer = false
-      this.isTrack = false
-      if (this.temp.state == "转院") {
-        this.isTransfer = true
-        console.log("病人出院了");
-      }
-      if (this.temp.state == "出院") {
-        this.isTrack = true;
-        console.log("跟踪病人");
-      }
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
-    let bedtype = [
+    const bedtype = [
       {
         index: 0,
-        value: "公共",
+        value: '公共'
       },
       {
         index: 1,
-        value: "静养",
+        value: '静养'
       },
       {
         index: 2,
-        value: "重症",
-      },
-    ];
+        value: '重症'
+      }
+    ]
     // TAG 日期管理
-    let pickerOptions = {
+    const pickerOptions = {
       disabledDate(time) {
-        return time.getTime() < Date.now();
+        return time.getTime() < Date.now()
       },
       shortcuts: [
         {
-          text: "今天",
+          text: '今天',
           onClick(picker) {
-            picker.$emit("pick", new Date());
-          },
+            picker.$emit('pick', new Date())
+          }
         },
         {
-          text: "明天",
+          text: '明天',
           onClick(picker) {
-            const date = new Date();
-            date.setTime(date.getTime() + 3600 * 1000 * 24);
-            picker.$emit("pick", date);
-          },
+            const date = new Date()
+            date.setTime(date.getTime() + 3600 * 1000 * 24)
+            picker.$emit('pick', date)
+          }
         },
         {
-          text: "一周后",
+          text: '一周后',
           onClick(picker) {
-            const date = new Date();
-            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
-            picker.$emit("pick", date);
-          },
-        },
-      ],
-    };
+            const date = new Date()
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', date)
+          }
+        }
+      ]
+    }
     return {
       tableKey: 0,
       list: null,
@@ -375,233 +353,247 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         departmentname: {},
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       states: [
         {
           index: 3,
-          value: "出院",
+          value: '出院'
         },
         {
           index: 4,
-          value: "转院",
-        },
-        {
-          index: 5,
-          value: "跟踪",
-        },
+          value: '转院'
+        }
+        // {
+        //   index: 5,
+        //   value: "跟踪",
+        // },
       ],
       isTrack: false,
       isTransfer: false,
       bedtype,
       pickerOptions,
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
         state: [],
         symptoms: [
-          { required: true, message: "symptoms is required", trigger: "blur" },
+          { required: true, message: 'symptoms is required', trigger: 'blur' }
         ],
         prescription: [
           {
             required: true,
-            message: "prescription is required",
-            trigger: "blur",
-          },
-        ],
+            message: 'prescription is required',
+            trigger: 'blur'
+          }
+        ]
       },
-      downloadLoading: false,
-    };
+      downloadLoading: false
+    }
   },
-  created() {
-    this.getList();
+  watch: {
+    'temp.state'() {
+      this.isTransfer = false
+      this.isTrack = false
+      if (this.temp.state == '转院') {
+        this.isTransfer = true
+        console.log('病人出院了')
+      }
+      if (this.temp.state == '出院') {
+        this.isTrack = true
+        console.log('跟踪病人')
+      }
+    }
+  },
+  mounted() {
+    this.getList()
   },
   methods: {
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       // TAG 获取数据
-      let requiredata = { ...this.$store.state.user };
-      requiredata.doctorid = requiredata.token;
-      Object.assign(this.listQuery,requiredata)
-      console.log("获取住院病人", this.listQuery);
-      this.$axios.post("/doctor/inHospital", this.listQuery).then((e) => {
-        console.log("inHospital", e.data);
-        let { data } = e;
-        this.list = data.items;
-        this.total = data.total;
+      const requiredata = { ...this.$store.state.user }
+      requiredata.doctorid = requiredata.token
+      Object.assign(this.listQuery, requiredata)
+      console.log('获取住院病人', this.listQuery)
+      this.$axios.post('/doctor/inHospital', this.listQuery).then((e) => {
+        console.log('inHospital', e.data)
+        const { data } = e
+        this.list = data.items
+        this.total = data.total
         setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
         doctorid: 0,
-        introduce: "",
-        name: "",
-        departmentname: "",
+        introduce: '',
+        name: '',
+        departmentname: '',
         id: undefined,
         importance: 1,
-        position: "",
-        remark: "",
+        position: '',
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
-      };
+        title: '',
+        status: 'published',
+        type: ''
+      }
     },
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
-    handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+    handleUpdate(row, $index) {
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.index = $index
+      this.temp.timestamp = new Date(this.temp.timestamp)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
-    updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+    updateData(row, index) {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.trackdate = this.dateFormat(tempData.trackdate);
-          
-          this.$axios.post("/doctor/commitsubscribe", tempData).then(() => {
+          const tempData = Object.assign({}, this.temp)
+          tempData.trackdate = this.dateFormat(tempData.trackdate)
+          const list = this.list
+          this.$axios.post('/doctor/commitsubscribe', tempData).then(() => {
             // const index = this.list.findIndex(
             //   (v) => v.doctorid === this.temp.doctorid
             // );
             // this.list.splice(index, 1, this.temp);
-            this.dialogFormVisible = false;
+            list.splice(tempData.index, 1)
+            this.dialogFormVisible = false
             this.$notify({
-              title: "Success",
-              message: "Update Successfully",
-              type: "success",
-              duration: 2000,
-            });
-            
-          });
-          
+              title: 'Success',
+              message: 'Update Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     dateFormat(dateData) {
-      var date = new Date(dateData);
-      var y = date.getFullYear();
-      var m = date.getMonth() + 1;
-      m = m < 10 ? "0" + m : m;
-      var d = date.getDate();
-      d = d < 10 ? "0" + d : d;
-      const time = y + "-" + m + "-" + d;
-      return time;
+      var date = new Date(dateData)
+      var y = date.getFullYear()
+      var m = date.getMonth() + 1
+      m = m < 10 ? '0' + m : m
+      var d = date.getDate()
+      d = d < 10 ? '0' + d : d
+      const time = y + '-' + m + '-' + d
+      return time
     },
     handleDelete(row, index) {
       this.$notify({
-        title: "Success",
-        message: "Delete Successfully",
-        type: "success",
-        duration: 2000,
-      });
-      this.list.splice(index, 1);
+        title: 'Success',
+        message: 'Delete Successfully',
+        type: 'success',
+        duration: 2000
+      })
+      this.list.splice(index, 1)
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["医生编号", "医生名字", "所属科室", "职位", "介绍"];
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['医生编号', '医生名字', '所属科室', '职位', '介绍']
         const filterVal = [
-          "doctorid",
-          "name",
-          "departmentname",
-          "position",
-          "introduce",
-        ];
-        const data = this.formatJson(filterVal);
+          'doctorid',
+          'name',
+          'departmentname',
+          'position',
+          'introduce'
+        ]
+        const data = this.formatJson(filterVal)
         // console.log("dian");
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "table-list",
-        });
-        this.downloadLoading = false;
-      });
+          filename: 'table-list'
+        })
+        this.downloadLoading = false
+      })
     },
     // TAG 添加excel的导入规则
     formatJson(filterVal) {
       // TODO 修改导出excel规则，应该使用全部信息的接口的数据
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>

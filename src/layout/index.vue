@@ -31,11 +31,11 @@ export default {
     Sidebar,
     TagsView
   },
-  mounted(){
-    console.log("fdsafas");
-    console.log(mapState({needTagsView: state => state.settings.tagsView,}));
-  },
   mixins: [ResizeMixin],
+  mounted() {
+    console.log('fdsafas')
+    console.log(mapState({ needTagsView: state => state.settings.tagsView }))
+  },
   computed: {
     ...mapState({
       sidebar: state => state.app.sidebar,

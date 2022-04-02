@@ -67,6 +67,7 @@ export const asyncRoutes = [{
 
   ]
 },
+// 管理员的权限
 {
   path: '/manager',
   component: Layout,
@@ -76,13 +77,13 @@ export const asyncRoutes = [{
     {
       path: 'doctor',
       name: 'doctor',
-      component: () => import('@/views/Doctor/Doctor.vue'),
+      component: () => import('@/views/Manager/Doctor.vue'),
       meta: { title: '医生', icon: 'doctor', roles: ['admin'] }
     },
     {
       path: 'department',
       name: 'department',
-      component: () => import('@/views/Department/Department.vue'),
+      component: () => import('@/views/Manager/Department.vue'),
       meta: {
         title: '部门',
         icon: 'dashboard',
@@ -92,15 +93,16 @@ export const asyncRoutes = [{
     {
       path: 'bed',
       name: 'bed',
-      component: () => import('@/views/Bed/Bed.vue'),
+      component: () => import('@/views/Manager/Bed.vue'),
       meta: {
         title: '病床管理',
         icon: 'bed',
         roles: ['admin']
       }
-    },
+    }
   ]
 },
+// 修改密码
 {
   path: '/ma',
   component: Layout,
@@ -111,7 +113,7 @@ export const asyncRoutes = [{
       name: 'updatepwd',
       component: () => import('@/views/UpdatePwd.vue'),
       meta: { title: '修改密码', icon: 'doctor', roles: ['doctor'] }
-    },
+    }
   ]
 }
 ]
@@ -268,7 +270,7 @@ export const constantRoutes = [
     component: Layout,
     children: [
       {
-        path: process.env.NODE_ENV === 'development' ? "http://localhost:3000/" : 'https://panjiachen.github.io/vue-element-admin-site/#/',
+        path: process.env.NODE_ENV === 'development' ? 'http://localhost:3000/' : 'https://panjiachen.github.io/vue-element-admin-site/#/',
         meta: { title: '外连接', icon: 'link' }
       }
     ]

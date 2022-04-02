@@ -186,24 +186,24 @@
               :key="item.index"
               :label="item.value"
               :value="item.value"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="症状" prop="symptoms">
           <el-input
+            v-model="temp.symptoms"
             type="textarea"
             :rows="2"
             placeholder="请输入内容"
-            v-model="temp.symptoms"
-          ></el-input>
+          />
         </el-form-item>
         <el-form-item label="处方" prop="prescription">
           <el-input
+            v-model="temp.prescription"
             type="textarea"
             :rows="2"
             placeholder="请输入内容"
-            v-model="temp.prescription"
-          ></el-input>
+          />
         </el-form-item>
         <!-- 是否住院 -->
         <template v-if="isInhospital">
@@ -218,7 +218,7 @@
                 :key="item.index"
                 :label="item.value"
                 :value="item.value"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
         </template>
@@ -231,8 +231,7 @@
               type="date"
               placeholder="选择日期"
               :picker-options="pickerOptions"
-            >
-            </el-date-picker>
+            />
           </el-form-item>
           <el-form-item label="跟踪地址" prop="trackaddress">
             <el-input v-model="temp.trackaddress" placeholder="请输入地址" />
@@ -263,9 +262,10 @@
         <el-table-column prop="pv" label="Pv" />
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false"
-          >Confirm</el-button
-        >
+        <el-button
+          type="primary"
+          @click="dialogPvVisible = false"
+        >Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -274,49 +274,78 @@
 <script>
 // TAG api
 // import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  name: "SubscribeTable",
+  name: 'SubscribeTable',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
-    let validestate = (rule, value, callback) => {
+    const validestate = (rule, value, callback) => {
       // console.log(value);
-      if (value == "排队") {
-        return callback(new Error("修改状态"));
+      if (value == '排队') {
+        return callback(new Error('修改状态'))
       }
-      callback();
-    };
-    let bedtype = [
+      callback()
+    }
+    const bedtype = [
       {
         index: 0,
-        value: "公共",
+        value: '公共'
       },
       {
         index: 1,
-        value: "静养",
+        value: '静养'
       },
       {
         index: 2,
-        value: "重症",
+        value: '重症'
+      }
+    ]
+    const pickerOptions = {
+      disabledDate(time) {
+        return time.getTime() < Date.now()
       },
-    ];
+      shortcuts: [
+        {
+          text: '今天',
+          onClick(picker) {
+            picker.$emit('pick', new Date())
+          }
+        },
+        {
+          text: '明天',
+          onClick(picker) {
+            const date = new Date()
+            date.setTime(date.getTime() + 3600 * 1000 * 24)
+            picker.$emit('pick', date)
+          }
+        },
+        {
+          text: '一周后',
+          onClick(picker) {
+            const date = new Date()
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', date)
+          }
+        }
+      ]
+    }
     return {
       tableKey: 0,
       list: null,
@@ -328,228 +357,229 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        state: "排队",
+        state: '排队'
       },
+      pickerOptions,
       states: [
         {
           index: 0,
-          value: "排队",
+          value: '排队'
         },
         {
           index: 1,
-          value: "完成",
+          value: '完成'
         },
         {
           index: 2,
-          value: "住院",
+          value: '住院'
         },
         {
           index: 5,
-          value: "跟踪",
-        },
+          value: '跟踪'
+        }
       ],
       bedtype,
       isTrack: false,
       isInhospital: false,
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        state: [{ validator: validestate, trigger: "change" }],
+        state: [{ validator: validestate, trigger: 'change' }],
         symptoms: [
-          { required: true, message: "symptoms is required", trigger: "blur" },
+          { required: true, message: 'symptoms is required', trigger: 'blur' }
         ],
         prescription: [
           {
             required: true,
-            message: "prescription is required",
-            trigger: "blur",
-          },
-        ],
+            message: 'prescription is required',
+            trigger: 'blur'
+          }
+        ]
       },
-      downloadLoading: false,
-    };
-  },
-  created() {
-    this.getList();
+      downloadLoading: false
+    }
   },
   watch: {
-    "temp.state"() {
-      if (this.temp.state == "住院") {
-        this.isInhospital = true;
+    'temp.state'() {
+      if (this.temp.state == '住院') {
+        this.isInhospital = true
       } else {
-        this.isInhospital = false;
+        this.isInhospital = false
       }
-      if (this.temp.state == "跟踪") {
-        this.isTrack = true;
+      if (this.temp.state == '跟踪') {
+        this.isTrack = true
       } else {
-        this.isTrack = false;
+        this.isTrack = false
       }
-    },
+    }
+  },
+  created() {
+    this.getList()
   },
   methods: {
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       // TAG 获取数据
-      let doctor = null;
-      let requiredata = { ...this.$store.state.user };
-      requiredata.doctorid = requiredata.token;
-      console.log("创建预约", this.$store.state.user);
-      this.$axios.post("/doctor/checksubscribe", requiredata).then((e) => {
-        console.log("checksubscribe接收数据", e.data);
-        let { data } = e;
-        this.list = data;
+      const doctor = null
+      const requiredata = { ...this.$store.state.user }
+      requiredata.doctorid = requiredata.token
+      console.log('创建预约', this.$store.state.user)
+      this.$axios.post('/doctor/checksubscribe', requiredata).then((e) => {
+        console.log('checksubscribe接收数据', e.data)
+        const { data } = e
+        this.list = data
         setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
-        nedname: "",
-        introduce: "",
-        name: "",
-        departmentname: "",
-      };
+        nedname: '',
+        introduce: '',
+        name: '',
+        departmentname: ''
+      }
     },
     createData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
-          console.log("添加医生的请求", this.temp);
-          this.$axios.post("doctor/addDoctor", this.temp).then((e) => {
-            let { data } = e;
-            this.temp.doctorid(e);
-            this.list.unshift(this.temp);
-            this.dialogFormVisible = false;
+          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          this.temp.author = 'vue-element-admin'
+          console.log('添加医生的请求', this.temp)
+          this.$axios.post('doctor/addDoctor', this.temp).then((e) => {
+            const { data } = e
+            this.temp.doctorid(e)
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
             this.$notify({
-              title: "Success",
-              message: "Created Successfully",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: 'Success',
+              message: 'Created Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
-        console.log("提交预约", valid);
+      this.$refs['dataForm'].validate((valid) => {
+        console.log('提交预约', valid)
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
+          const tempData = Object.assign({}, this.temp)
           // tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          this.$axios.post("/doctor/commitsubscribe", tempData).then(() => {
+          this.$axios.post('/doctor/commitsubscribe', tempData).then(() => {
             const index = this.list.findIndex(
               (v) => v.doctorid === this.temp.doctorid
-            );
-            this.list.splice(index, 1, this.temp);
-            this.dialogFormVisible = false;
+            )
+            this.list.splice(index, 1, this.temp)
+            this.dialogFormVisible = false
             this.$notify({
-              title: "Success",
-              message: "Update Successfully",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: 'Success',
+              message: 'Update Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleDelete(row, index) {
       this.$notify({
-        title: "Success",
-        message: "Delete Successfully",
-        type: "success",
-        duration: 2000,
-      });
-      this.list.splice(index, 1);
+        title: 'Success',
+        message: 'Delete Successfully',
+        type: 'success',
+        duration: 2000
+      })
+      this.list.splice(index, 1)
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["医生编号", "医生名字", "所属科室", "职位", "介绍"];
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['医生编号', '医生名字', '所属科室', '职位', '介绍']
         const filterVal = [
-          "doctorid",
-          "name",
-          "departmentname",
-          "position",
-          "introduce",
-        ];
-        const data = this.formatJson(filterVal);
+          'doctorid',
+          'name',
+          'departmentname',
+          'position',
+          'introduce'
+        ]
+        const data = this.formatJson(filterVal)
         // console.log("dian");
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "table-list",
-        });
-        this.downloadLoading = false;
-      });
+          filename: 'table-list'
+        })
+        this.downloadLoading = false
+      })
     },
     // TAG 添加excel的导入规则
     formatJson(filterVal) {
       // TODO 修改导出excel规则，应该使用全部信息的接口的数据
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>

@@ -44,17 +44,9 @@
         icon="el-icon-search"
         @click="handleFilter"
       >
-        Search
+        搜索
       </el-button>
-      <el-button
-        class="filter-item"
-        style="margin-left: 10px"
-        type="primary"
-        icon="el-icon-edit"
-        @click="handleCreate"
-      >
-        Add
-      </el-button>
+
       <el-button
         v-waves
         :loading="downloadLoading"
@@ -63,7 +55,7 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        Export
+        导出
       </el-button>
       <el-checkbox
         v-model="showReviewer"
@@ -128,11 +120,11 @@
         width="230"
         class-name="small-padding fixed-width"
       >
-        <template slot-scope="{ row, $index }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+        <template slot-scope="{ row }">
+          <el-button type="primary" size="mini" :disabled="row.status=='完成'" @click="handleUpdate(row)">
+            编辑
           </el-button>
-          <el-button
+          <!-- <el-button
             v-if="row.status != 'published'"
             size="mini"
             type="success"
@@ -154,7 +146,7 @@
             @click="handleDelete(row, $index)"
           >
             Delete
-          </el-button>
+          </el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -213,8 +205,7 @@
               type="date"
               placeholder="选择日期"
               :picker-options="pickerOptions"
-            >
-            </el-date-picker>
+            />
           </el-form-item>
           <el-form-item label="跟踪地址" prop="trackaddress">
             <el-input v-model="temp.retrackaddress" placeholder="请输入地址" />
@@ -245,9 +236,10 @@
         <el-table-column prop="pv" label="Pv" />
       </el-table>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false"
-          >Confirm</el-button
-        >
+        <el-button
+          type="primary"
+          @click="dialogPvVisible = false"
+        >Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -256,80 +248,71 @@
 <script>
 // TAG api
 // import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
-let conditions = [
-  { key: 0, value: "正常" },
-  { key: 1, value: "跟踪" },
-  { key: 2, value: "重症" },
-];
+const conditions = [
+  { key: 0, value: '正常' },
+  { key: 1, value: '跟踪' },
+  { key: 2, value: '重症' }
+]
 export default {
-  name: "BedTable",
+  name: 'BedTable',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
-  },
-  watch: {
-    "temp.conditions"() {
-      if (this.temp.conditions == "跟踪") {
-        this.isTrack = true;
-      } else {
-        this.isTrack = false;
-      }
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
-    let validateIntroduce = (rule, value, callback) => {
+    const validateIntroduce = (rule, value, callback) => {
       if (!value) {
-        callback("科室的介绍必须有");
+        callback('科室的介绍必须有')
       }
       if (value.length > 50) {
-        callback("科室的介绍超过50字");
+        callback('科室的介绍超过50字')
       }
-      callback();
-    };
-    let pickerOptions = {
+      callback()
+    }
+    const pickerOptions = {
       disabledDate(time) {
-        return time.getTime() < Date.now();
+        return time.getTime() < Date.now()
       },
       shortcuts: [
         {
-          text: "今天",
+          text: '今天',
           onClick(picker) {
-            picker.$emit("pick", new Date());
-          },
+            picker.$emit('pick', new Date())
+          }
         },
         {
-          text: "明天",
+          text: '明天',
           onClick(picker) {
-            const date = new Date();
-            date.setTime(date.getTime() + 3600 * 1000 * 24);
-            picker.$emit("pick", date);
-          },
+            const date = new Date()
+            date.setTime(date.getTime() + 3600 * 1000 * 24)
+            picker.$emit('pick', date)
+          }
         },
         {
-          text: "一周后",
+          text: '一周后',
           onClick(picker) {
-            const date = new Date();
-            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
-            picker.$emit("pick", date);
-          },
-        },
-      ],
-    };
+            const date = new Date()
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', date)
+          }
+        }
+      ]
+    }
     return {
       tableKey: 0,
       list: null,
@@ -341,117 +324,126 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         importance: 1,
-        title: "",
-        type: "",
-        conditions: "",
+        title: '',
+        type: '',
+        conditions: ''
       },
       pickerOptions,
       isTrack: false,
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       conditions,
       //   业务 表现名
       textMap: {
-        update: "更新",
-        create: "创建",
+        update: '更新',
+        create: '创建'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
         departmentname: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
+          { required: true, message: '请输入活动名称', trigger: 'blur' }
         ],
         introduce: [
           {
             validator: validateIntroduce,
-            trigger: "blur",
-          },
-        ],
+            trigger: 'blur'
+          }
+        ]
       },
-      downloadLoading: false,
-    };
+      downloadLoading: false
+    }
+  },
+  watch: {
+    'temp.conditions'() {
+      if (this.temp.conditions == '跟踪') {
+        this.isTrack = true
+      } else {
+        this.isTrack = false
+      }
+    }
   },
   mounted() {
-    this.getList();
+    this.getList()
   },
   methods: {
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       // TAG 获取数据
-      let requiredata = { ...this.$store.state.user };
-      this.listQuery.doctorid = requiredata.token;
-      console.log("tracking的请求参数", this.listQuery);
+      const requiredata = { ...this.$store.state.user }
+      this.listQuery.doctorid = requiredata.token
+      console.log('tracking的请求参数', this.listQuery)
       this.$axios
-        .post("/doctor/checkTrackRecord", this.listQuery)
+        .post('/doctor/checkTrackRecord', this.listQuery)
         .then((response) => {
-          console.log("tracking接收到的,", response.data);
-          this.list = response.data.items;
-          this.total = response.data.total;
+          console.log('tracking接收到的,', response.data)
+          this.list = response.data.items
+          this.total = response.data.total
 
           // Just to simulate the time of the request
           setTimeout(() => {
-            this.listLoading = false;
-          }, 1.5 * 1000);
-        });
+            this.listLoading = false
+          }, 1.5 * 1000)
+        })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
-      };
+        title: '',
+        status: 'published',
+        type: ''
+      }
     },
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     // TAG 添加数据
     createData() {
-      console.log("创建");
+      console.log('创建')
       // this.$refs["dataForm"].validate((valid) => {
       //   if (valid) {
       //     console.log("添加的科室请求信息", this.temp);
@@ -469,86 +461,89 @@ export default {
       // });
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp)
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     updateData() {
-      console.log("提交跟踪记录");
-      this.$refs["dataForm"].validate((valid) => {
+      console.log('提交跟踪记录')
+      this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp);
-          tempData.timestamp = +new Date(tempData.timestamp); // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          this.$axios.post("/admin/commitTrack", tempData).then(() => {
-            const index = this.list.findIndex((v) => v.id === this.temp.id);
-            this.list.splice(index, 1, this.temp);
-            this.dialogFormVisible = false;
+          const tempData = Object.assign({}, this.temp)
+
+          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          this.$axios.post('/doctor/commitTrack', tempData).then(() => {
+            const index = this.list.findIndex((v) => v.id === this.temp.id)
+            tempData.status = '完成'
+            console.log('修改值')
+            this.list.splice(index, 1, tempData)
+            this.dialogFormVisible = false
             this.$notify({
-              title: "Success",
-              message: "Update Successfully",
-              type: "success",
-              duration: 2000,
-            });
-          });
+              title: 'Success',
+              message: 'Update Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
         }
-      });
+      })
     },
     handleDelete(row, index) {
-      console.log("删除", row);
-      this.$axios.post("admin/deleteBed", row).then((e) => {});
+      console.log('删除', row)
+      this.$axios.post('admin/deleteBed', row).then((e) => {})
       this.$notify({
-        title: "Success",
-        message: "Delete Successfully",
-        type: "success",
-        duration: 2000,
-      });
-      this.list.splice(index, 1);
+        title: 'Success',
+        message: 'Delete Successfully',
+        type: 'success',
+        duration: 2000
+      })
+      this.list.splice(index, 1)
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["timestamp", "title", "type", "importance", "status"];
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
         const filterVal = [
-          "timestamp",
-          "title",
-          "type",
-          "importance",
-          "status",
-        ];
-        const data = this.formatJson(filterVal);
+          'timestamp',
+          'title',
+          'type',
+          'importance',
+          'status'
+        ]
+        const data = this.formatJson(filterVal)
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "table-list",
-        });
-        this.downloadLoading = false;
-      });
+          filename: 'table-list'
+        })
+        this.downloadLoading = false
+      })
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>

@@ -67,7 +67,7 @@ const actions = {
         }
 
         const { name, roles } = data
-        commit('SET_USER',data)
+        commit('SET_USER', data)
         commit('SET_NAME', name)
         commit('SET_ROLES', roles)
         // commit('SET_AVATAR', avatar)
