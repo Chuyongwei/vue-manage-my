@@ -32,10 +32,6 @@ export default {
     TagsView
   },
   mixins: [ResizeMixin],
-  mounted() {
-    console.log('fdsafas')
-    console.log(mapState({ needTagsView: state => state.settings.tagsView }))
-  },
   computed: {
     ...mapState({
       sidebar: state => state.app.sidebar,
@@ -53,6 +49,11 @@ export default {
       }
     }
   },
+  mounted() {
+    console.log('fdsafas')
+    console.log(mapState({ needTagsView: state => state.settings.tagsView }))
+  },
+
   methods: {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })

@@ -64,7 +64,6 @@ export const asyncRoutes = [{
         roles: ['doctor']
       }
     }
-
   ]
 },
 // 管理员的权限
@@ -157,6 +156,15 @@ export const constantRoutes = [
         component: () => import('@/views/Score/BedScore.vue'),
         meta: {
           title: '病床记录',
+          icon: 'score'
+        }
+      },
+      {
+        path: 'calendar',
+        name: 'calendar',
+        component: () => import('@/views/Score/Calendar.vue'),
+        meta: {
+          title: '值班日历',
           icon: 'score'
         }
       }

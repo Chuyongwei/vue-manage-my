@@ -270,9 +270,9 @@ export default {
       }
       return statusMap[status]
     },
-    typeFilter(type) {
+/*     typeFilter(type) {
       return calendarTypeKeyValue[type]
-    }
+    } */
   },
   data() {
     return {
@@ -393,7 +393,7 @@ export default {
           console.log('添加的科室请求信息', this.temp)
           this.$axios.post('admin/addBed', this.temp).then((e) => {
             const newbed = e.data
-            newbed.departmentname = this.departments.filter((v) => v.departmentid == newbed.departmentid)[0].departmentname
+            newbed.departmentname = this.departments.filter((v) => v.departmentid === newbed.departmentid)[0].departmentname
             this.list.unshift(newbed)
             this.dialogFormVisible = false
             this.$notify({
@@ -449,12 +449,6 @@ export default {
         duration: 2000
       })
       this.list.splice(index, 1)
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
     },
     handleDownload() {
       this.downloadLoading = true

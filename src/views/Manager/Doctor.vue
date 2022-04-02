@@ -234,14 +234,11 @@ export default {
         deleted: 'danger'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
   },
   data() {
     var checkDeparmentId = function(rules, value, callback) {
-      if (value == 0) { return callback(new Error('选择科室')) }
+      if (value === 0) { return callback(new Error('选择科室')) }
       callback()
     }
     return {
@@ -299,13 +296,7 @@ export default {
     getList() {
       this.listLoading = true
       // TAG 获取数据
-      this.$axios
-        .get('/doctor/checkDeparment')
-        .then((e) => {
-          console.log('department接收数据', e.data)
-          const { data } = e
-          this.departments.push(...data)
-        })
+
         .then(() => {
           this.$axios.post('/doctor/check', this.listQuery).then((response) => {
             this.list = response.data.items
@@ -314,9 +305,9 @@ export default {
             const departments = this.departments
             this.list.map((l) => {
               const department = departments.filter(
-                (e) => e.departmentid == l.departmentid
+                (e) => e.departmentid === l.departmentid
               )
-              if (department.length == 0) {
+              if (department.length === 0) {
                 l.departmentname = ''
               } else {
                 l.departmentname = department[0].departmentname
