@@ -238,7 +238,9 @@ export default {
   },
   data() {
     var checkDeparmentId = function(rules, value, callback) {
-      if (value === 0) { return callback(new Error('选择科室')) }
+      if (value === 0) {
+        return callback(new Error('选择科室'))
+      }
       callback()
     }
     return {
@@ -281,9 +283,7 @@ export default {
           { required: true, message: '请选择科室', trigger: 'change' },
           { validator: checkDeparmentId, trigger: 'change' }
         ],
-        name: [
-          { required: true, message: '名称必须有', trigger: 'blur' }
-        ],
+        name: [{ required: true, message: '名称必须有', trigger: 'blur' }],
         position: [{ required: true, message: '职位必须有', trigger: 'blur' }]
       },
       downloadLoading: false
@@ -296,31 +296,29 @@ export default {
     getList() {
       this.listLoading = true
       // TAG 获取数据
-
-        .then(() => {
-          this.$axios.post('/doctor/check', this.listQuery).then((response) => {
-            this.list = response.data.items
-            this.total = response.data.total
-            console.log('doctor接收的数据', this.list)
-            const departments = this.departments
-            this.list.map((l) => {
-              const department = departments.filter(
-                (e) => e.departmentid === l.departmentid
-              )
-              if (department.length === 0) {
-                l.departmentname = ''
-              } else {
-                l.departmentname = department[0].departmentname
-              }
-              // console.log(l.departmentname[0]["departmentname"]);
-              // departments.filters(e=>e.departm/entid==1)
-            })
-            // Just to simulate the time of the request
-            setTimeout(() => {
-              this.listLoading = false
-            }, 1.5 * 1000)
-          })
+      this.departments.push(...this.$store.state.department.departments)
+      this.$axios.post('/doctor/check', this.listQuery).then((response) => {
+        this.list = response.data.items
+        this.total = response.data.total
+        console.log('doctor接收的数据', this.list)
+        const departments = this.departments
+        this.list.map((l) => {
+          const department = departments.filter(
+            (e) => e.departmentid === l.departmentid
+          )
+          if (department.length === 0) {
+            l.departmentname = ''
+          } else {
+            l.departmentname = department[0].departmentname
+          }
+          setTimeout(() => {
+            this.listLoading = false
+          }, 1.5 * 1000)
+          // console.log(l.departmentname[0]["departmentname"]);
+          // departments.filters(e=>e.departm/entid==1)
         })
+        // Just to simulate the time of the request
+      })
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -373,8 +371,11 @@ export default {
           console.log('添加医生的请求', this.temp)
           this.$axios.post('doctor/addDoctor', this.temp).then((e) => {
             const { data } = e
-            this.temp.doctorid = data.doctorid
-            this.list.unshift(this.temp)
+            // this.temp.doctorid = data.doctorid
+            data.departmentname = this.departments.filter(e => {
+              return e.departmentid === data.departmentid
+            })[0].departmentname
+            this.list.unshift(data)
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -401,7 +402,9 @@ export default {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           this.$axios.post('/doctor/updateDoctor', tempData).then(() => {
-            const index = this.list.findIndex((v) => v.doctorid === this.temp.doctorid)
+            const index = this.list.findIndex(
+              (v) => v.doctorid === this.temp.doctorid
+            )
             this.list.splice(index, 1, this.temp)
             this.dialogFormVisible = false
             this.$notify({

@@ -323,8 +323,9 @@ export default {
           this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
           //   this.temp.author = "vue-element-admin";
           console.log('添加的科室请求信息', this.temp)
-          this.$axios.post('admin/addDepartment', this.temp).then(() => {
-            this.list.unshift(this.temp)
+          this.$axios.post('admin/addDepartment', this.temp).then((e) => {
+            console.log(e.data)
+            this.list.unshift(e.data)
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',

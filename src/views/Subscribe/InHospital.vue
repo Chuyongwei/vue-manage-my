@@ -21,7 +21,7 @@
           v-for="item in bedtype"
           :key="item.index"
           :label="item.value"
-          :value="item.index"
+          :value="item.value"
         />
       </el-select>
       <!-- <el-select
@@ -300,6 +300,10 @@ export default {
   data() {
     const bedtype = [
       {
+        index: 4,
+        value: '全部'
+      },
+      {
         index: 0,
         value: '公共'
       },
@@ -375,7 +379,7 @@ export default {
       states: [
         {
           index: 3,
-          value: '出院'
+          value: 'git出院'
         },
         {
           index: 4,

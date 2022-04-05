@@ -173,6 +173,7 @@ export default {
         { value: '星期六' },
         { value: '星期七' }
       ],
+      departmentid: 1,
       rules: {},
       dialogFormVisible: false,
       doctors: [],
@@ -181,28 +182,25 @@ export default {
       dailys: ['上午', '下午', '晚上'],
       temp: {
         doctorid: 0
-      },
-      qList: {
-        row: '',
-        col: ''
       }
     }
   },
   created() {
+    this.departments = this.$store.state.department.departments
     this.getList()
   },
   methods: {
     getList() {
-      this.departments = this.$store.state.department.departments
-      this.$axios.get('/admin/checkDutyByDepartment').then((e) => {
+      this.$axios.get('/admin/checkDutyByDepartment?departmentid=' + this.departmentid).then((e) => {
         const dutyList2 = e.data
+        this.dutyList = []
         for (let i = 0; i < 3; i++) {
           this.dutyList.push(dutyList2.splice(0, 7))
         }
-        console.log(this.dutyList)
+        console.log('获取的值班表', this.dutyList)
       })
       const doctor = {
-        departmentid: 1
+        departmentid: this.departmentid
       }
       this.$axios.post('/doctor/check', doctor).then((e) => {
         console.log(e)
@@ -210,19 +208,29 @@ export default {
       })
     },
     handleFilter() {
+      this.departmentid = this.listQuery.departmentid
+      this.getList()
       console.log('搜索')
     },
     updateDuty(node, row, col) {
       //   this.$axios.post('admin/updateDuty', node).then(e => {
       //     console.log(e)
       //   })
+      const user = this.$store.state.user
+      let b = true
+      user.roles.forEach(e => {
+        if (e === 'admin') {
+          b = false
+        }
+      })
+      if (b === true) return
       this.temp = {}
       Object.assign(this.temp, node)
       this.temp.doctorid = node.doctor_id
       console.log(this.temp)
       this.dialogFormVisible = true
-      this.qList.row = row
-      this.qList.col = col
+      this.listQuery.row = row
+      this.listQuery.col = col
     },
     updateData() {
       // Object.assign(this.temp, { ...this.temp.doctor })
@@ -234,8 +242,8 @@ export default {
       Object.assign(this.temp, { ...doctor[0] })
       // this.temp.doctor = null
       console.log(this.temp)
-      const row = this.qList.row
-      const col = this.qList.col
+      const row = this.listQuery.row
+      const col = this.listQuery.col
 
       this.$axios.post('admin/updateDuty', this.temp).then(e => {
         if (e.data > 0) {
