@@ -290,18 +290,23 @@ export default {
     }
   },
   created() {
+    this.departments.push(...this.$store.state.department.departments)
     this.getList()
   },
   methods: {
     getList() {
       this.listLoading = true
       // TAG 获取数据
-      this.departments.push(...this.$store.state.department.departments)
+      console.log('科室表', this.departments)
+
       this.$axios.post('/doctor/check', this.listQuery).then((response) => {
-        this.list = response.data.items
+        this.list = response.data.items !== null ? response.data.items : []
         this.total = response.data.total
         console.log('doctor接收的数据', this.list)
         const departments = this.departments
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 100)
         this.list.map((l) => {
           const department = departments.filter(
             (e) => e.departmentid === l.departmentid
@@ -311,13 +316,7 @@ export default {
           } else {
             l.departmentname = department[0].departmentname
           }
-          setTimeout(() => {
-            this.listLoading = false
-          }, 1.5 * 1000)
-          // console.log(l.departmentname[0]["departmentname"]);
-          // departments.filters(e=>e.departm/entid==1)
         })
-        // Just to simulate the time of the request
       })
     },
     handleFilter() {
@@ -372,7 +371,7 @@ export default {
           this.$axios.post('doctor/addDoctor', this.temp).then((e) => {
             const { data } = e
             // this.temp.doctorid = data.doctorid
-            data.departmentname = this.departments.filter(e => {
+            data.departmentname = this.departments.filter((e) => {
               return e.departmentid === data.departmentid
             })[0].departmentname
             this.list.unshift(data)

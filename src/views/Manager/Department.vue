@@ -327,6 +327,7 @@ export default {
             console.log(e.data)
             this.list.unshift(e.data)
             this.dialogFormVisible = false
+            this.$store.dispatch('department/getDepartment')
             this.$notify({
               title: 'Success',
               message: 'Created Successfully',
@@ -377,12 +378,12 @@ export default {
         this.list.splice(index, 1)
       })
     },
-    handleFetchPv(pv) {
+    /*     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData
         this.dialogPvVisible = true
       })
-    },
+    }, */
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then((excel) => {

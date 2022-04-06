@@ -292,9 +292,6 @@ export default {
         deleted: 'danger'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
   },
   data() {
@@ -379,7 +376,7 @@ export default {
       states: [
         {
           index: 3,
-          value: 'git出院'
+          value: '出院'
         },
         {
           index: 4,
@@ -422,11 +419,11 @@ export default {
     'temp.state'() {
       this.isTransfer = false
       this.isTrack = false
-      if (this.temp.state == '转院') {
+      if (this.temp.state === '转院') {
         this.isTransfer = true
         console.log('病人出院了')
       }
-      if (this.temp.state == '出院') {
+      if (this.temp.state === '出院') {
         this.isTrack = true
         console.log('跟踪病人')
       }
@@ -554,12 +551,12 @@ export default {
       })
       this.list.splice(index, 1)
     },
-    handleFetchPv(pv) {
+    /*     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData
         this.dialogPvVisible = true
       })
-    },
+    }, */
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then((excel) => {

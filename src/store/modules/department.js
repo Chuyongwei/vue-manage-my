@@ -33,7 +33,7 @@ const mutations = {
 }
 
 const actions = {
-  getDepartment({ commit }, store) {
+  getDepartment({ commit }) {
     getDepartment().then((data) => {
       commit('SET_DEPARTMENT', data)
     })
