@@ -134,7 +134,7 @@
       >
         <template slot-scope="{ row, $index }">
           <el-button type="primary" size="mini" @click="handleUpdate(row,$index)">
-            Edit
+            诊断
           </el-button>
           <!--           <el-button
             v-if="row.status != 'published'"
@@ -394,7 +394,7 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
+        update: '诊断',
         create: 'Create'
       },
       dialogPvVisible: false,

@@ -269,8 +269,8 @@ export default {
         deleted: 'danger'
       }
       return statusMap[status]
-    },
-/*     typeFilter(type) {
+    }
+    /*     typeFilter(type) {
       return calendarTypeKeyValue[type]
     } */
   },

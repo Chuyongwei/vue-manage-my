@@ -290,15 +290,12 @@ export default {
         deleted: 'danger'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
   },
   data() {
     const validestate = (rule, value, callback) => {
       // console.log(value);
-      if (value == '排队') {
+      if (value === '排队') {
         return callback(new Error('修改状态'))
       }
       callback()
@@ -417,12 +414,12 @@ export default {
   },
   watch: {
     'temp.state'() {
-      if (this.temp.state == '住院') {
+      if (this.temp.state === '住院') {
         this.isInhospital = true
       } else {
         this.isInhospital = false
       }
-      if (this.temp.state == '跟踪') {
+      if (this.temp.state === '跟踪') {
         this.isTrack = true
       } else {
         this.isTrack = false
@@ -436,7 +433,6 @@ export default {
     getList() {
       this.listLoading = true
       // TAG 获取数据
-      const doctor = null
       const requiredata = { ...this.$store.state.user }
       requiredata.doctorid = requiredata.token
       console.log('创建预约', this.$store.state.user)
@@ -477,23 +473,7 @@ export default {
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          console.log('添加医生的请求', this.temp)
-          this.$axios.post('doctor/addDoctor', this.temp).then((e) => {
-            const { data } = e
-            this.temp.doctorid(e)
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
+
       })
     },
     handleUpdate(row) {
@@ -535,12 +515,6 @@ export default {
         duration: 2000
       })
       this.list.splice(index, 1)
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
     },
     handleDownload() {
       this.downloadLoading = true

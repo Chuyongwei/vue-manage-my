@@ -247,10 +247,10 @@ export default {
         deleted: 'danger'
       }
       return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
     }
+    /*     typeFilter(type) {
+      return calendarTypeKeyValue[type]
+    } */
   },
   data() {
     const validateIntroduce = (rule, value, callback) => {
@@ -423,12 +423,12 @@ export default {
       })
       this.list.splice(index, 1)
     },
-    handleFetchPv(pv) {
+    /*     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData
         this.dialogPvVisible = true
       })
-    },
+    }, */
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then((excel) => {

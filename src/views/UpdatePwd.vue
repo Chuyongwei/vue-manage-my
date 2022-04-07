@@ -8,19 +8,27 @@
       label-width="80px"
       style="width: 400px; margin-left: 50px"
     >
-      <el-form-item prop="password" label="密码">
+      <el-form-item prop="olderpass" label="原密码">
         <el-input
-          v-model="loginForm.password"
-          placeholder="Password"
+          v-model="loginForm.olderpass"
+          placeholder="输入原始密码"
           name="password"
           auto-complete="on"
         />
       </el-form-item>
-      <el-form-item prop="repass" label="密码">
+      <el-form-item prop="password" label="新密码">
+        <el-input
+          v-model="loginForm.password"
+          placeholder="输入原始密码"
+          name="password"
+          auto-complete="on"
+        />
+      </el-form-item>
+      <el-form-item prop="repass" label="确认密码">
         <el-input
           v-model="loginForm.repass"
           placeholder="Password"
-          name="password"
+          name="repass"
           auto-complete="on"
         />
       </el-form-item>
@@ -35,21 +43,37 @@ export default {
     const validatePassword = (rule, value, callback) => {
       // console.log(value)
       if (!value || value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('密码应该超过6位'))
       } else {
         callback()
       }
     }
+
+    const validateRepass = (rule, value, callback) => {
+      if (this.loginForm.password !== this.loginForm.repass) {
+        callback(new Error('密码不一样'))
+      } else {
+        callback()
+      }
+    }
+
     return {
       loginForm: {
+        olderpass: '',
         repass: '',
         password: ''
       },
       temp: {},
       passwordType: 'password',
       rules: {
+        olderpass: [
+          { required: true, trigger: 'blur', message: '请输入原密码' }
+        ],
         password: [
           { required: true, trigger: 'blur', validator: validatePassword }
+        ],
+        repass: [
+          { required: true, trigger: 'blur', validator: validateRepass }
         ]
       }
     }
@@ -70,11 +94,11 @@ export default {
       })
     },
     updatepwd() {
-      if (this.loginForm.repass === this.loginForm.loginForm.repass) {
-        console.log('密码不一致')
-      } else {
-        console.log('修改密码')
-      }
+      // if (this.loginForm.repass === this.loginForm.loginForm.repass) {
+      //   console.log('密码不一致')
+      // } else {
+      //   console.log('修改密码')
+      // }
     }
   }
 }
