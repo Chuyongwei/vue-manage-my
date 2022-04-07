@@ -60,7 +60,6 @@ const actions = {
     console.log('store', state)
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(data => {
-        // const { data } = response
         console.log('store获取的user', data)
         if (!data) {
           return reject('Verification failed, please Login again.')

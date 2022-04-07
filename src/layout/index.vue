@@ -50,7 +50,12 @@ export default {
     }
   },
   mounted() {
-    console.log('fdsafas')
+    const user = this.$store.state.user.user
+    console.log('Layout显示')
+    if (user.passStatus === 0) {
+      alert('请先修改密码')
+      this.$router.push('/ma/updatepwd')
+    }
     console.log(mapState({ needTagsView: state => state.settings.tagsView }))
   },
 

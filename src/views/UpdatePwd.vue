@@ -3,7 +3,7 @@
     <el-form
       ref="dataForm"
       :rules="rules"
-      :model="temp"
+      :model="loginForm"
       label-position="left"
       label-width="80px"
       style="width: 400px; margin-left: 50px"
@@ -44,6 +44,8 @@ export default {
       // console.log(value)
       if (!value || value.length < 6) {
         callback(new Error('密码应该超过6位'))
+      } else if (value === this.loginForm.olderpass) {
+        callback(new Error('修改密码不能与原密码相同'))
       } else {
         callback()
       }
@@ -63,7 +65,6 @@ export default {
         repass: '',
         password: ''
       },
-      temp: {},
       passwordType: 'password',
       rules: {
         olderpass: [
@@ -80,6 +81,7 @@ export default {
   },
   mounted() {
     const id = this.$store.state.user.user.doctorid
+    this.loginForm.doctorid = id
     console.log(id)
   },
   methods: {
@@ -94,11 +96,13 @@ export default {
       })
     },
     updatepwd() {
-      // if (this.loginForm.repass === this.loginForm.loginForm.repass) {
-      //   console.log('密码不一致')
-      // } else {
-      //   console.log('修改密码')
-      // }
+      this.$axios.post('/doctor/updatePassword', this.loginForm).then(e => {
+        if (e.data === -1) {
+          alert('密码错误')
+        } else if (e.data === 1) {
+          alert('修改成功')
+        }
+      })
     }
   }
 }
