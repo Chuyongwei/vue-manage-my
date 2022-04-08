@@ -5,6 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
+import { inc } from 'nprogress'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -148,7 +149,7 @@ export const constantRoutes = [
   {
     path: '/score',
     component: Layout,
-    meta: { title: '记录' },
+    meta: { title: '记录', icon: 'score' },
     children: [
       {
         path: 'bedscore',
@@ -165,6 +166,15 @@ export const constantRoutes = [
         component: () => import('@/views/Score/Calendar.vue'),
         meta: {
           title: '值班日历',
+          icon: 'score'
+        }
+      },
+      {
+        path: 'map',
+        name: 'map',
+        component: () => import('@/views/Score/Map.vue'),
+        meta: {
+          title: '医院地图',
           icon: 'score'
         }
       }
