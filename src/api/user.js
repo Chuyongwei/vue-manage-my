@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 // TAG 提交登录信息（后端接口）
 export function login(data) {
-  console.log('sadf', data)
+  console.log('api/login', data)
   return request({
     url: '/doctor/login',
     method: 'post',

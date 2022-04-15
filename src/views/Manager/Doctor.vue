@@ -153,6 +153,17 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
+        <el-upload
+          class="avatar-uploader"
+          action="/api/common/uploadLocal"
+          :show-file-list="false"
+          :data="imagedata"
+          :on-success="handleAvatarSuccess"
+          :before-upload="beforeAvatarUpload"
+        >
+          <img v-if="imageUrl" :src="imageUrl" class="avatar">
+          <i v-else class="el-icon-plus avatar-uploader-icon" />
+        </el-upload>
         <el-form-item label="名字" prop="name">
           <el-input v-model="temp.name" placeholder="请输入名字" />
         </el-form-item>
@@ -255,6 +266,8 @@ export default {
         type: undefined,
         sort: '+id'
       },
+      imageUrl: '',
+      imagedata: {},
       importanceOptions: [1, 2, 3],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
@@ -302,7 +315,7 @@ export default {
       this.$axios.post('/doctor/check', this.listQuery).then((response) => {
         this.list = response.data.items !== null ? response.data.items : []
         this.total = response.data.total
-        console.log('doctor接收的数据', this.list)
+        console.log('doctor接收的数据', response.data)
         const departments = this.departments
         setTimeout(() => {
           this.listLoading = false
@@ -389,6 +402,10 @@ export default {
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
+      this.imagedata.doctorid = row.doctorid
+      if (row.avatar != null) {
+        this.imageUrl = '/api/common/LocalImg/' + row.avatar
+      }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -447,6 +464,21 @@ export default {
         this.downloadLoading = false
       })
     },
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw)
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!')
+      }
+      return isJPG && isLt2M
+    },
     // TAG 添加excel的导入规则
     formatJson(filterVal) {
       // TODO 修改导出excel规则，应该使用全部信息的接口的数据
@@ -472,3 +504,28 @@ export default {
   }
 }
 </script>
+<style scoped>
+   .el-upload {
+    border: 1px dashed #000;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .el-upload:hover {
+    border-color: #000;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+</style>
