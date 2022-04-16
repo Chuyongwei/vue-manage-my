@@ -57,8 +57,11 @@
       >Login</el-button>
 
       <div class="tips">
+        <span>欢迎使用由小魏设计的系统！！！</span>
+      <!-- XXX 一些没有用的登录提示
         <span style="margin-right: 20px">username: admin</span>
         <span> password: any</span>
+      -->
       </div>
     </el-form>
   </div>

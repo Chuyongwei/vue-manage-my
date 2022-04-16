@@ -5,7 +5,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
-import { inc } from 'nprogress'
+// import { inc } from 'nprogress'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -140,7 +140,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }
 
     ]

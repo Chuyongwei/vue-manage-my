@@ -107,6 +107,13 @@
           <span>{{ row.position }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="头像" min-width="50px" align="center">
+        <template slot-scope="{ row }">
+          <!-- <img :src="imgUrl(row.avatar)"> -->
+          <img v-if="row.avatar" style="width:50px;height:50px" :src="'/api/common/LocalImg/'+row.avatar" alt="医生头像">
+          <span v-else style="color:red">无头像</span>
+        </template>
+      </el-table-column>
       <el-table-column label="介绍" min-width="110px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.introduce }}</span>
@@ -114,7 +121,7 @@
       </el-table-column>
 
       <el-table-column
-        label="Actions"
+        label="操作"
         align="center"
         width="230"
         class-name="small-padding fixed-width"
@@ -153,17 +160,19 @@
         label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-upload
-          class="avatar-uploader"
-          action="/api/common/uploadLocal"
-          :show-file-list="false"
-          :data="imagedata"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload"
-        >
-          <img v-if="imageUrl" :src="imageUrl" class="avatar">
-          <i v-else class="el-icon-plus avatar-uploader-icon" />
-        </el-upload>
+        <div v-show="dialogStatus !== 'create'">
+          <el-upload
+            class="avatar-uploader"
+            action="/api/common/uploadLocal"
+            :show-file-list="false"
+            :data="imagedata"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon" />
+          </el-upload>
+        </div>
         <el-form-item label="名字" prop="name">
           <el-input v-model="temp.name" placeholder="请输入名字" />
         </el-form-item>
@@ -300,6 +309,12 @@ export default {
         position: [{ required: true, message: '职位必须有', trigger: 'blur' }]
       },
       downloadLoading: false
+    }
+  },
+  computed: {
+    imgUrl(url) {
+      // TAG 修改头像
+      return '/api/common/LocalImg/' + url
     }
   },
   created() {
