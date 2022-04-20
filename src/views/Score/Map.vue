@@ -6,7 +6,7 @@
           {{ m.address }}--{{ m.name }}
         </div>
       </div>
-      <span style="color: red">dsafhjk</span>
+      <span style="color: red">楼梯</span>
       <div class="floor-right">
         <div v-for="m in map[0]" :key="m.id" class="floor-item">
           {{ m.address }}--{{ m.name }}

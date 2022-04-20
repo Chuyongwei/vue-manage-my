@@ -128,7 +128,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="Actions"
+        label="操作"
         align="center"
         width="230"
         class-name="small-padding fixed-width"

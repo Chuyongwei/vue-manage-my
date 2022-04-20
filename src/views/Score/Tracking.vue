@@ -4,26 +4,11 @@
     <div class="filter-container">
       <el-input
         v-model="listQuery.title"
-        placeholder="Title"
+        placeholder="姓名"
         style="width: 200px"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
-      <el-select
-        v-model="listQuery.importance"
-        placeholder="Imp"
-        clearable
-        style="width: 90px"
-        class="filter-item"
-      >
-        <el-option
-          v-for="item in importanceOptions"
-          :key="item"
-          :label="item"
-          :value="item"
-        />
-      </el-select>
-
       <el-select
         v-model="listQuery.sort"
         style="width: 140px"
@@ -31,10 +16,10 @@
         @change="handleFilter"
       >
         <el-option
-          v-for="item in sortOptions"
+          v-for="item in conditionList"
           :key="item.key"
-          :label="item.label"
-          :value="item.key"
+          :label="item.value"
+          :value="item.value"
         />
       </el-select>
       <el-button
@@ -115,7 +100,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="Actions"
+        label="操作"
         align="center"
         width="230"
         class-name="small-padding fixed-width"
@@ -310,6 +295,7 @@ export default {
         }
       ]
     }
+    const conditionList = [{ key: 3, value: '全部' }, ...conditions]
     return {
       tableKey: 0,
       list: null,
@@ -320,14 +306,8 @@ export default {
         limit: 20,
         importance: undefined,
         title: undefined,
-        type: undefined,
-        sort: '+id'
+        type: undefined
       },
-      importanceOptions: [1, 2, 3],
-      sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
-      ],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
@@ -341,6 +321,7 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       conditions,
+      conditionList,
       //   业务 表现名
       textMap: {
         update: '更新',
@@ -410,14 +391,6 @@ export default {
       if (prop === 'id') {
         this.sortByID(order)
       }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
