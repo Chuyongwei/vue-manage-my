@@ -325,15 +325,19 @@ export default {
           console.log('添加的科室请求信息', this.temp)
           this.$axios.post('admin/addDepartment', this.temp).then((e) => {
             console.log(e.data)
-            this.list.unshift(e.data)
-            this.dialogFormVisible = false
-            this.$store.dispatch('department/getDepartment')
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
+            if (e.data.departmentid == null) {
+              console.log('出错')
+            } else {
+              this.list.unshift(e.data)
+              this.dialogFormVisible = false
+              this.$store.dispatch('department/getDepartment')
+              this.$notify({
+                title: 'Success',
+                message: 'Created Successfully',
+                type: 'success',
+                duration: 2000
+              })
+            }
           })
         }
       })

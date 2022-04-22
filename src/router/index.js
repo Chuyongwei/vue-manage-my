@@ -100,6 +100,7 @@ export const asyncRoutes = [{
         roles: ['admin']
       }
     }
+
   ]
 },
 // 修改密码
@@ -176,6 +177,16 @@ export const constantRoutes = [
         meta: {
           title: '医院地图',
           icon: 'score'
+        }
+      },
+      {
+        path: 'patient-record',
+        name: 'patient-record',
+        component: () => import('@/views/Score/Patient.vue'),
+        meta: {
+          title: '跟踪病人',
+          icon: 'trackScore',
+          roles: ['doctor']
         }
       }
     ]

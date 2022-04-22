@@ -395,11 +395,11 @@ export default {
       if (this.listQuery.conditions === '全部') {
         this.listQuery.conditions = null
       }
-      console.log('tracking的请求参数', this.listQuery)
+      console.log('病历请求参数', this.listQuery)
       this.$axios
-        .post('/doctor/checkTrackRecord', this.listQuery)
+        .post('/doctor/checkMedical', this.listQuery)
         .then((response) => {
-          console.log('tracking接收到的,', response.data)
+          console.log('病历接收到的,', response.data)
           this.list = response.data.items
           this.total = response.data.total
 
