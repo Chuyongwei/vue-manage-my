@@ -3,38 +3,27 @@
     <!-- 筛选栏 -->
     <div class="filter-container">
       <el-input
-        v-model="listQuery.title"
-        placeholder="姓名"
+        v-model="listQuery.uname"
+        placeholder="患者姓名"
         style="width: 200px"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-select
-        v-model="listQuery.conditions"
-        style="width: 140px"
+        v-model="listQuery.departmentid"
+        placeholder="科室名称"
+        clearable
+        style="width: 120px"
         class="filter-item"
-        @change="handleFilter"
       >
         <el-option
-          v-for="item in conditionList"
-          :key="item.key"
-          :label="item.value"
-          :value="item.value"
+          v-for="item in departments"
+          :key="item.departmentid"
+          :label="item.departmentname"
+          :value="item.departmentid"
         />
       </el-select>
-      <el-select
-        v-model="listQuery.status"
-        style="width: 140px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in typeList"
-          :key="item.key"
-          :label="item.value"
-          :value="item.value"
-        />
-      </el-select>
+
       <el-button
         v-waves
         class="filter-item"
@@ -44,7 +33,15 @@
       >
         搜索
       </el-button>
-
+      <el-button
+        class="filter-item"
+        style="margin-left: 10px"
+        type="primary"
+        icon="el-icon-edit"
+        @click="handleCreate"
+      >
+        添加医生
+      </el-button>
       <el-button
         v-waves
         :loading="downloadLoading"
@@ -53,7 +50,7 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        导出
+        导出图表
       </el-button>
       <el-checkbox
         v-model="showReviewer"
@@ -79,63 +76,71 @@
       <!-- NOTE 在列中设置sortable属性即可实现以该列为基准的排序 设置为custom 就是有后端排序 -->
       <!-- NOTE slot-scope设置行中的项的名字 -->
       <el-table-column
-        label="编号"
-        prop="bsid"
+        label="病人编号"
+        prop="patientid"
         sortable="custom"
         align="center"
-        width="80"
-        :class-name="getSortClass('recordid')"
+        width="100"
+        :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.medicalid }}</span>
+          <span>{{ row.patientid }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="病人名字" width="80px">
+      <!-- <el-table-column label="Date" width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+        </template>
+      </el-table-column> -->
+      <el-table-column label="病人名字" width="150px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.uname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="日期" width="120px">
+      <el-table-column label="病人状态" width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.date }}</span>
+          <span>{{ row.health }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="科室" class-name="status-col" width="80px">
+      <el-table-column label="手机号" min-width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.departmentname }}</span>
+          <span>{{ row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="情况" class-name="status-col" width="80px">
+      <el-table-column label="头像" min-width="50px" align="center">
         <template slot-scope="{ row }">
-          <el-tag :type="row.conditions | statusFilter">
-            {{ row.conditions? row.conditions:"无" }}
-          </el-tag>
+          <!-- <img :src="imgUrl(row.avatar)"> -->
+          <img v-if="row.imgId" style="width:50px;height:50px" :src="'/api/common/printImg/'+row.imgId" alt="医生头像">
+          <span v-else style="color:red">无头像</span>
         </template>
       </el-table-column>
-      <el-table-column label="症状" min-width="80px">
+      <el-table-column label="医保号" min-width="110px" align="center">
         <template slot-scope="{ row }">
-          <!-- <span>{{ row.prescription }}</span> -->
-          <span>{{ row.symptoms }}</span>
+          <span>{{ row.insuranceNumber }}</span>
         </template>
       </el-table-column>
+
       <el-table-column
         label="操作"
         align="center"
         width="230"
         class-name="small-padding fixed-width"
       >
-        <template slot-scope="{ row }">
-          <el-button
-            type="primary"
-            size="mini"
-            :disabled="row.status == '完成'"
-            @click="handleUpdate(row)"
-          >
+        <!-- <template slot-scope="{ row, $index }">
+          <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-        </template>
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleDelete(row, $index)"
+          >
+            删除
+          </el-button>
+        </template> -->
       </el-table-column>
     </el-table>
+
     <!-- 分页栏 -->
     <pagination
       v-show="total > 0"
@@ -145,75 +150,66 @@
       @pagination="getList"
     />
 
-    <!-- TAG 添加弹窗 -->
+    <!-- 弹窗 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
         ref="dataForm"
         :rules="rules"
         :model="temp"
         label-position="left"
-        label-width="80px"
+        label-width="70px"
         style="width: 400px; margin-left: 50px"
       >
-        <el-form-item label="编号" prop="medicalid">
-          <el-input v-model="temp.medicalid" disabled />
+        <div v-show="dialogStatus !== 'create'">
+          <el-upload
+            class="avatar-uploader"
+            action="/api/common/uploadLocal"
+            :show-file-list="false"
+            :data="imagedata"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon" />
+          </el-upload>
+        </div>
+        <el-form-item label="名字" prop="name">
+          <el-input v-model="temp.name" placeholder="请输入名字" />
         </el-form-item>
-        <el-form-item label="姓名" prop="recordid">
-          <el-input v-model="temp.uname" disabled />
-        </el-form-item>
-        <el-form-item label="类型" prop="type">
+        <el-form-item label="科室" prop="departmentid">
           <el-select
-            v-model="temp.conditions"
+            v-model="temp.departmentid"
             class="filter-item"
             placeholder="Please select"
           >
             <el-option
-              v-for="item in conditions"
+              v-for="item in departments"
               :key="item.key"
-              :label="item.value"
-              :value="item.value"
+              :label="item.departmentname"
+              :value="item.departmentid"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="症状">
+        <el-form-item label="职位" prop="position">
+          <el-input v-model="temp.position" placeholder="请输入职位" />
+        </el-form-item>
+        <el-form-item label="介绍" prop="introduce">
           <el-input
-            v-model="temp.symptoms"
-            :autosize="{ minRows: 2, maxRows: 4 }"
+            v-model="temp.introduce"
             type="textarea"
-            placeholder="Please input"
+            :rows="2"
+            placeholder="请输入内容"
           />
         </el-form-item>
-        <el-form-item label="方案">
-          <el-input
-            v-model="temp.prescription"
-            :autosize="{ minRows: 2, maxRows: 4 }"
-            type="textarea"
-            placeholder="Please input"
-          />
-        </el-form-item>
-        <template v-if="isTrack">
-          <el-form-item label="下次日期" prop="trackdate">
-            <el-date-picker
-              v-model="temp.retrackdate"
-              align="right"
-              type="date"
-              placeholder="选择日期"
-              :picker-options="pickerOptions"
-            />
-          </el-form-item>
-          <el-form-item label="跟踪地址" prop="trackaddress">
-            <el-input v-model="temp.retrackaddress" placeholder="请输入地址" />
-          </el-form-item>
-        </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> 返回 </el-button>
-        <!-- <el-button
+        <el-button @click="dialogFormVisible = false">返回 </el-button>
+        <el-button
           type="primary"
           @click="dialogStatus === 'create' ? createData() : updateData()"
         >
-          确定
-        </el-button> -->
+          提交
+        </el-button>
       </div>
     </el-dialog>
 
@@ -246,13 +242,8 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
-const conditions = [
-  { key: 0, value: '正常' },
-  { key: 1, value: '跟踪' },
-  { key: 2, value: '重症' }
-]
 export default {
-  name: 'BedTable',
+  name: 'DoctorTable',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -266,50 +257,6 @@ export default {
     }
   },
   data() {
-    const validateIntroduce = (rule, value, callback) => {
-      if (!value) {
-        callback('科室的介绍必须有')
-      }
-      if (value.length > 50) {
-        callback('科室的介绍超过50字')
-      }
-      callback()
-    }
-    const pickerOptions = {
-      disabledDate(time) {
-        return time.getTime() < Date.now()
-      },
-      shortcuts: [
-        {
-          text: '今天',
-          onClick(picker) {
-            picker.$emit('pick', new Date())
-          }
-        },
-        {
-          text: '明天',
-          onClick(picker) {
-            const date = new Date()
-            date.setTime(date.getTime() + 3600 * 1000 * 24)
-            picker.$emit('pick', date)
-          }
-        },
-        {
-          text: '一周后',
-          onClick(picker) {
-            const date = new Date()
-            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7)
-            picker.$emit('pick', date)
-          }
-        }
-      ]
-    }
-    const conditionList = [{ key: 3, value: '全部' }, ...conditions]
-    const typeList = [
-      { key: 0, value: '全部' },
-      { key: 1, value: '完成' },
-      { key: 2, value: '代办' }
-    ]
     return {
       tableKey: 0,
       list: null,
@@ -318,80 +265,69 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined
+        departmentid: 0,
+        type: undefined,
+        sort: '+id'
       },
+      imageUrl: '',
+      imagedata: {},
+      importanceOptions: [1, 2, 3],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
+        id: undefined,
         importance: 1,
+        remark: '',
+        departmentname: {},
+        timestamp: new Date(),
         title: '',
         type: '',
-        conditions: ''
+        status: 'published'
       },
-      pickerOptions,
-      isTrack: false,
+      // 部门集合
+      departments: [{ departmentid: 0, departmentname: '全部科室' }],
       dialogFormVisible: false,
       dialogStatus: '',
-      conditions,
-      conditionList,
-      typeList,
-      //   业务 表现名
       textMap: {
-        update: '更新',
-        create: '创建'
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        departmentname: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' }
-        ],
-        introduce: [
-          {
-            validator: validateIntroduce,
-            trigger: 'blur'
-          }
-        ]
+        // departmentid: [
+        //   { required: true, message: '请选择科室', trigger: 'change' },
+        //   { validator: checkDeparmentId, trigger: 'change' }
+        // ],
+        // name: [{ required: true, message: '名称必须有', trigger: 'blur' }],
+        // position: [{ required: true, message: '职位必须有', trigger: 'blur' }]
       },
       downloadLoading: false
     }
   },
-  watch: {
-    'temp.conditions'() {
-      if (this.temp.conditions === '跟踪') {
-        this.isTrack = true
-      } else {
-        this.isTrack = false
-      }
+  computed: {
+    imgUrl(url) {
+      // TAG 修改头像
+      return '/api/common/printImg/' + url
     }
   },
-  mounted() {
+  created() {
+    this.departments.push(...this.$store.state.department.departments)
     this.getList()
   },
   methods: {
     getList() {
       this.listLoading = true
       // TAG 获取数据
-      const requiredata = { ...this.$store.state.user }
-      this.listQuery.doctorid = requiredata.token
-      if (this.listQuery.conditions === '全部') {
-        this.listQuery.conditions = null
-      }
-      console.log('病历请求参数', this.listQuery)
-      this.$axios
-        .post('/doctor/checkMedical', this.listQuery)
-        .then((response) => {
-          console.log('病历接收到的,', response.data)
-          this.list = response.data.items
-          this.total = response.data.total
 
-          // Just to simulate the time of the request
-          setTimeout(() => {
-            this.listLoading = false
-          }, 1.5 * 1000)
-        })
+      this.$axios.post('/admin/checkPatient', this.listQuery).then((response) => {
+        this.list = response.data.items !== null ? response.data.items : []
+        this.total = response.data.total
+        console.log('病人接收的数据', response.data)
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 100)
+      })
     },
     handleFilter() {
       this.listQuery.page = 1
@@ -410,13 +346,22 @@ export default {
         this.sortByID(order)
       }
     },
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
     resetTemp() {
       this.temp = {
+        doctorid: 0,
+        introduce: '',
+        name: '',
+        departmentname: '',
         id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
+        position: '',
         status: 'published',
         type: ''
       }
@@ -429,28 +374,35 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    // TAG 添加数据
     createData() {
-      console.log('创建')
-      // this.$refs["dataForm"].validate((valid) => {
-      //   if (valid) {
-      //     console.log("添加的科室请求信息", this.temp);
-      //     this.$axios.post("admin/addBed", this.temp).then((e) => {
-      //       this.list.unshift(e.data);
-      //       this.dialogFormVisible = false;
-      //       this.$notify({
-      //         title: "Success",
-      //         message: "Created Successfully",
-      //         type: "success",
-      //         duration: 2000,
-      //       });
-      //     });
-      //   }
-      // });
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          console.log('添加医生的请求', this.temp)
+          this.$axios.post('doctor/addDoctor', this.temp).then((e) => {
+            const { data } = e
+            // this.temp.doctorid = data.doctorid
+            data.departmentname = this.departments.filter((e) => {
+              return e.departmentid === data.departmentid
+            })[0].departmentname
+            this.list.unshift(data)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Success',
+              message: 'Created Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
+      this.imagedata.doctorid = row.doctorid
+      if (row.avatar != null) {
+        this.imageUrl = '/api/common/LocalImg/' + row.avatar
+      }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -458,17 +410,15 @@ export default {
       })
     },
     updateData() {
-      console.log('提交跟踪记录')
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          this.$axios.post('/doctor/commitTrack', tempData).then(() => {
-            const index = this.list.findIndex((v) => v.id === this.temp.id)
-            tempData.status = '完成'
-            console.log('修改值')
-            this.list.splice(index, 1, tempData)
+          this.$axios.post('/doctor/updateDoctor', tempData).then(() => {
+            const index = this.list.findIndex(
+              (v) => v.doctorid === this.temp.doctorid
+            )
+            this.list.splice(index, 1, this.temp)
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -481,8 +431,7 @@ export default {
       })
     },
     handleDelete(row, index) {
-      console.log('删除', row)
-      this.$axios.post('admin/deleteBed', row).then((e) => {})
+      this.$axios.post('/doctor/deleteDoctor', row)
       this.$notify({
         title: 'Success',
         message: 'Delete Successfully',
@@ -494,15 +443,16 @@ export default {
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then((excel) => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
+        const tHeader = ['医生编号', '医生名字', '所属科室', '职位', '介绍']
         const filterVal = [
-          'timestamp',
-          'title',
-          'type',
-          'importance',
-          'status'
+          'doctorid',
+          'name',
+          'departmentname',
+          'position',
+          'introduce'
         ]
         const data = this.formatJson(filterVal)
+        // console.log("dian");
         excel.export_json_to_excel({
           header: tHeader,
           data,
@@ -511,7 +461,29 @@ export default {
         this.downloadLoading = false
       })
     },
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw)
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!')
+      }
+      return isJPG && isLt2M
+    },
+    // TAG 添加excel的导入规则
     formatJson(filterVal) {
+      // TODO 修改导出excel规则，应该使用全部信息的接口的数据
+      const pushlist = {}
+      Object.assign(pushlist, this.listQuery)
+      pushlist.limit = null
+      console.log('准备导出的筛选数据', this.listQuery)
+      // this.$axios.post("",)
       return this.list.map((v) =>
         filterVal.map((j) => {
           if (j === 'timestamp') {
@@ -529,3 +501,28 @@ export default {
   }
 }
 </script>
+<style scoped>
+   .el-upload {
+    border: 1px dashed #000;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .el-upload:hover {
+    border-color: #000;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+</style>

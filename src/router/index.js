@@ -78,15 +78,25 @@ export const asyncRoutes = [{
       path: 'doctor',
       name: 'doctor',
       component: () => import('@/views/Manager/Doctor.vue'),
-      meta: { title: '医生', icon: 'doctor', roles: ['admin'] }
+      meta: { title: '医生管理', icon: 'doctor', roles: ['admin'] }
     },
     {
       path: 'department',
       name: 'department',
       component: () => import('@/views/Manager/Department.vue'),
       meta: {
-        title: '部门',
+        title: '部门管理',
         icon: 'dashboard',
+        roles: ['admin']
+      }
+    },
+    {
+      path: 'patient',
+      name: 'patient',
+      component: () => import('@/views/Manager/Patient.vue'),
+      meta: {
+        title: '病人管理',
+        icon: 'doctor',
         roles: ['admin']
       }
     },
