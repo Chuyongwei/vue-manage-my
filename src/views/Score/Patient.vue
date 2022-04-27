@@ -266,15 +266,6 @@ export default {
     }
   },
   data() {
-    const validateIntroduce = (rule, value, callback) => {
-      if (!value) {
-        callback('科室的介绍必须有')
-      }
-      if (value.length > 50) {
-        callback('科室的介绍超过50字')
-      }
-      callback()
-    }
     const pickerOptions = {
       disabledDate(time) {
         return time.getTime() < Date.now()
@@ -347,12 +338,6 @@ export default {
       rules: {
         departmentname: [
           { required: true, message: '请输入活动名称', trigger: 'blur' }
-        ],
-        introduce: [
-          {
-            validator: validateIntroduce,
-            trigger: 'blur'
-          }
         ]
       },
       downloadLoading: false

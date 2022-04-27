@@ -60,7 +60,7 @@ export const asyncRoutes = [{
       name: 'tracking',
       component: () => import('@/views/Score/Tracking.vue'),
       meta: {
-        title: '跟踪病人',
+        title: '病人记录',
         icon: 'trackScore',
         roles: ['doctor']
       }
@@ -194,116 +194,13 @@ export const constantRoutes = [
         name: 'patient-record',
         component: () => import('@/views/Score/Patient.vue'),
         meta: {
-          title: '跟踪病人',
+          title: '病人病历',
           icon: 'trackScore',
           roles: ['doctor']
         }
       }
     ]
   },
-
-  // TAG 编写不能写到导航栏中的路由
-  // 使用 words.filter(word => word.length > 6);
-
-  // {
-  //   path: '/manager2',
-  //   component: Layout,
-  //   name:"manager",
-  //   redirect:"/manager/checkdetial",
-  //   meta:{title:"病人管理"},
-  //   children:[
-  //     // HACK 可能需要添加查找的页面
-  //     // XXX 子组件获取参数this.$route.params.id
-  //     //
-  //     {
-  //       path: 'checkdetial',
-  //       name: 'checkdetial',
-  //       component: Layout,
-  //       meta:{title:'病人病历'}
-  //     },
-  //     // 可能会设计成浮窗
-  //     {
-  //       path: 'uploadreport',
-  //       name: "uploadreport",
-  //       meta: {title:'提交检查报告'}
-  //     }
-
-  //   ]
-  // },
-  //
-
-  // {
-  //   path: '/form',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'Form',
-  //       component: () => import('@/views/form/index'),
-  //       meta: { title: 'Form', icon: 'form' }
-  //     }
-  //   ]
-  // },
-
-  // {
-  //   path: '/nested',
-  //   component: Layout,
-  //   redirect: '/nested/menu1',
-  //   name: 'Nested',
-  //   meta: {
-  //     title: 'Nested',
-  //     icon: 'nested'
-  //   },
-  //   children: [
-  //     {
-  //       path: 'menu1',
-  //       component: () => import('@/views/nested/menu1/index'), // Parent router-view
-  //       name: 'Menu1',
-  //       meta: { title: 'Menu1' },
-  //       children: [
-  //         {
-  //           path: 'menu1-1',
-  //           component: () => import('@/views/nested/menu1/menu1-1'),
-  //           name: 'Menu1-1',
-  //           meta: { title: 'Menu1-1' }
-  //         },
-  //         {
-  //           path: 'menu1-2',
-  //           component: () => import('@/views/nested/menu1/menu1-2'),
-  //           name: 'Menu1-2',
-  //           meta: { title: 'Menu1-2' },
-  //           children: [
-  //             {
-  //               path: 'menu1-2-1',
-  //               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-  //               name: 'Menu1-2-1',
-  //               meta: { title: 'Menu1-2-1' }
-  //             },
-  //             {
-  //               path: 'menu1-2-2',
-  //               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-  //               name: 'Menu1-2-2',
-  //               meta: { title: 'Menu1-2-2' }
-  //             }
-  //           ]
-  //         },
-  //         {
-  //           path: 'menu1-3',
-  //           component: () => import('@/views/nested/menu1/menu1-3'),
-  //           name: 'Menu1-3',
-  //           meta: { title: 'Menu1-3' }
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       path: 'menu2',
-  //       component: () => import('@/views/nested/menu2/index'),
-  //       name: 'Menu2',
-  //       meta: { title: 'menu2' }
-  //     }
-  //   ]
-  // },
-
   {
     path: 'external-link',
     component: Layout,
