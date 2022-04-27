@@ -75,12 +75,6 @@ export const asyncRoutes = [{
   redirect: '/manager/department',
   children: [
     {
-      path: 'doctor',
-      name: 'doctor',
-      component: () => import('@/views/Manager/Doctor.vue'),
-      meta: { title: '医生管理', icon: 'doctor', roles: ['admin'] }
-    },
-    {
       path: 'department',
       name: 'department',
       component: () => import('@/views/Manager/Department.vue'),
@@ -90,6 +84,23 @@ export const asyncRoutes = [{
         roles: ['admin']
       }
     },
+    {
+      path: 'doctor',
+      name: 'doctor',
+      component: () => import('@/views/Manager/Doctor.vue'),
+      meta: { title: '医生管理', icon: 'doctor', roles: ['admin'] }
+    },
+    {
+      path: 'dutyRecord',
+      name: 'dutyRecord',
+      component: () => import('@/views/Manager/DutyRecord.vue'),
+      meta: {
+        title: '值班安排记录',
+        icon: 'score',
+        router: ['admin']
+      }
+    },
+
     {
       path: 'patient',
       name: 'patient',
