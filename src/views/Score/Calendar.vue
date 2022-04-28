@@ -186,7 +186,9 @@ export default {
     }
   },
   created() {
-    this.departments = this.$store.state.department.departments
+    setTimeout(() => {
+      this.departments = this.$store.state.department.departments
+    }, 1000)
     this.getList()
   },
   methods: {
@@ -194,8 +196,13 @@ export default {
       this.$axios.get('/admin/checkDutyByDepartment?departmentid=' + this.departmentid).then((e) => {
         const dutyList2 = e.data
         this.dutyList = []
-        for (let i = 0; i < 3; i++) {
-          this.dutyList.push(dutyList2.splice(0, 7))
+        console.log('获取的数据', dutyList2)
+        for (let i = 0; i < dutyList2.length; i++) {
+          const week = parseInt((i + 21) % 21 / 3)
+          const am = i % 3
+          console.log(week, am)
+          if (week === 0) { this.dutyList[am] = [] }
+          this.dutyList[am][week] = dutyList2[i]
         }
         console.log('获取的值班表', this.dutyList)
       })
