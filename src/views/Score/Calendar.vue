@@ -118,9 +118,9 @@
         style="width: 400px; margin-left: 50px"
       >
         <el-select
-          v-model="temp.doctor_id"
+          v-model="temp.doctorid"
           class="filter-item"
-          placeholder="Please select"
+          placeholder="修改值"
         >
           <el-option
             v-for="item in doctors"
@@ -129,11 +129,11 @@
             :value="item.doctorid"
           />
         </el-select>
-        {{ temp.doctorid }}
+        {{ temp.doctorid==null?"null":temp.doctorid }}
       </el-form>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
+        <el-button @click="dialogFormVisible = false"> 返回 </el-button>
         <el-button type="primary" @click="updateData()"> 提交 </el-button>
       </div>
     </el-dialog>
@@ -181,7 +181,6 @@ export default {
       tableData: [],
       dailys: ['上午', '下午', '晚上'],
       temp: {
-        doctorid: 0
       }
     }
   },
@@ -210,19 +209,15 @@ export default {
         departmentid: this.departmentid
       }
       this.$axios.post('/doctor/check', doctor).then((e) => {
-        console.log(e)
+        console.log('获取的医生', e)
         this.doctors = e.data.items
       })
     },
     handleFilter() {
       this.departmentid = this.listQuery.departmentid
       this.getList()
-      console.log('搜索')
     },
     updateDuty(node, row, col) {
-      //   this.$axios.post('admin/updateDuty', node).then(e => {
-      //     console.log(e)
-      //   })
       const user = this.$store.state.user
       let b = true
       user.roles.forEach(e => {
@@ -233,25 +228,20 @@ export default {
       if (b === true) return
       this.temp = {}
       Object.assign(this.temp, node)
-      this.temp.doctorid = node.doctor_id
-      console.log(this.temp)
+      // this.temp.doctorid = node.doctor_id
+      console.log('弹窗数据', this.temp)
       this.dialogFormVisible = true
       this.listQuery.row = row
       this.listQuery.col = col
     },
     updateData() {
-      // Object.assign(this.temp, { ...this.temp.doctor })
-      const doctor = this.doctors.filter((e) => {
-        return e.doctorid === this.temp.doctor_id
-      })
-      console.log(doctor)
-      this.temp.doctorid = this.temp.doctor_id
-      Object.assign(this.temp, { ...doctor[0] })
+      this.temp.dutyid = this.temp.duty_id
+      // Object.assign(this.temp, { ...doctor[0] })
       // this.temp.doctor = null
-      console.log(this.temp)
+      this.temp.departmentid = this.departmentid
       const row = this.listQuery.row
       const col = this.listQuery.col
-
+      console.log('提交数据', this.temp)
       this.$axios.post('admin/updateDuty', this.temp).then(e => {
         if (e.data > 0) {
           const doctor = {

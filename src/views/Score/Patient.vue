@@ -3,33 +3,20 @@
     <!-- 筛选栏 -->
     <div class="filter-container">
       <el-input
-        v-model="listQuery.title"
+        v-model="listQuery.uname"
         placeholder="姓名"
         style="width: 200px"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-select
-        v-model="listQuery.conditions"
+        v-model="listQuery.state"
         style="width: 140px"
         class="filter-item"
         @change="handleFilter"
       >
         <el-option
-          v-for="item in conditionList"
-          :key="item.key"
-          :label="item.value"
-          :value="item.value"
-        />
-      </el-select>
-      <el-select
-        v-model="listQuery.status"
-        style="width: 140px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in typeList"
+          v-for="item in states"
           :key="item.key"
           :label="item.value"
           :value="item.value"
@@ -107,8 +94,8 @@
       </el-table-column>
       <el-table-column label="情况" class-name="status-col" width="80px">
         <template slot-scope="{ row }">
-          <el-tag :type="row.conditions | statusFilter">
-            {{ row.conditions? row.conditions:"无" }}
+          <el-tag :type="row.state | statusFilter">
+            {{ row.state? row.state:"无" }}
           </el-tag>
         </template>
       </el-table-column>
@@ -251,6 +238,14 @@ const conditions = [
   { key: 1, value: '跟踪' },
   { key: 2, value: '重症' }
 ]
+
+const states = [
+  { key: 0, value: '全部' },
+  { key: 1, value: '排队' },
+  { key: 2, value: '住院' },
+  { key: 3, value: '完成' },
+  { key: 4, value: '出院' }
+]
 export default {
   name: 'BedTable',
   components: { Pagination },
@@ -327,6 +322,7 @@ export default {
       dialogStatus: '',
       conditions,
       conditionList,
+      states,
       typeList,
       //   业务 表现名
       textMap: {
@@ -361,9 +357,13 @@ export default {
       // TAG 获取数据
       const requiredata = { ...this.$store.state.user }
       this.listQuery.doctorid = requiredata.token
-      if (this.listQuery.conditions === '全部') {
-        this.listQuery.conditions = null
+      if (requiredata.user.departmentid === 2) {
+        this.listQuery.doctorid = null
       }
+      if (this.listQuery.state === '全部') {
+        this.listQuery.state = null
+      }
+      console.log('信息', requiredata)
       console.log('病历请求参数', this.listQuery)
       this.$axios
         .post('/doctor/checkMedical', this.listQuery)
