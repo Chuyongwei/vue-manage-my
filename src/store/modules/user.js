@@ -40,15 +40,16 @@ const actions = {
   // TAG 登录的业务
   // user login
   login({ commit }, userInfo) {
-    const { doctorid, password } = userInfo
+    const { doctorid, password, code } = userInfo
     return new Promise((resolve, reject) => {
-      login({ doctorid: doctorid.trim(), password: password }).then(data => {
-        console.log('store接收的', userInfo)
+      login({ doctorid: doctorid.trim(), password: password, code: code }).then(data => {
         // const { data } = response
         console.log('store中的登录', data)
-        commit('SET_TOKEN', data.doctorid)
-        setToken(data.doctorid)
-        resolve()
+        if (data.doctorid != null) {
+          commit('SET_TOKEN', data.doctorid)
+          setToken(data.doctorid)
+        }
+        resolve(data)
       }).catch(error => {
         reject(error)
       })

@@ -9,7 +9,7 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">登录界面</h3>
       </div>
 
       <el-form-item prop="doctorid">
@@ -49,20 +49,53 @@
         </span>
       </el-form-item>
 
+      <!-- <el-form-item>
+        <div style="margin-top: 50px">
+          <span>验证码：</span><input
+            id="verifyCode"
+            type="text"
+            name="verifyCode"
+            style="width: 75px; height: 25px"
+          >
+          <img
+            id="verifyCodeImg"
+            alt="点击更换"
+            src="/api/common/getVerifyCodeImg"
+            title="点击更换"
+            onclick="change()"
+          >
+        </div>
+      </el-form-item> -->
+      <el-form-item prop="code">
+        <el-input
+          v-model="loginForm.code"
+          type="text"
+          placeholder="验证码"
+          @keyup.enter.native="handleLogin"
+        >
+          <template slot="append">
+            <img
+              id="verifyCodeImg"
+              class="login-code"
+              src="/api/common/getVerifyCodeImg"
+              @click="changeVerify"
+            >
+          </template>
+        </el-input>
+      </el-form-item>
       <el-button
         :loading="loading"
         type="primary"
         style="width: 100%; margin-bottom: 30px"
         @click.native.prevent="handleLogin"
-      >Login</el-button>
+      >登录</el-button>
 
       <div class="tips">
         <span>欢迎使用由小魏设计的系统！！！</span>
-      <!-- XXX 一些没有用的登录提示
+        <!-- XXX 一些没有用的登录提示
         <span style="margin-right: 20px">username: admin</span>
         <span> password: any</span>
-      -->
-      </div>
+      --></div>
     </el-form>
   </div>
 </template>
@@ -91,7 +124,8 @@ export default {
       // XXX 要改成空的
       loginForm: {
         doctorid: '1002',
-        password: '654321'
+        password: '654321',
+        code: ''
       },
       // TODO: 修改表单规则
       loginRules: {
@@ -120,24 +154,38 @@ export default {
         this.$refs.password.focus()
       })
     },
+    changeVerify() {
+      var verifyCode = document.getElementById('verifyCodeImg')
+      console.log('修改验证码')
+      verifyCode.src = '/api/common/getVerifyCodeImg?time=' + Math.random(1000)
+    },
     // 检查是否可登录
     handleLogin() {
       // NOTE：使用loginForm上的组件的功能来检查错误
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          console.log(valid)
           this.loading = true
+          console.log('发送登录数据', this.loginForm)
           this.$store
             .dispatch('user/login', this.loginForm)
             .then((e) => {
               console.log('login获取的', e)
-              this.$router.push({ path: this.redirect || '/' })
-              this.loading = false
+              if (e.code === '-1') {
+                this.$message.error('验证码不正确')
+
+                return
+              }
+              if (e.doctorid != null) {
+                this.$router.push({ path: this.redirect || '/' })
+              } else {
+                this.$message.error('账户或密码不正确')
+              }
             })
-            .catch(() => {
+            .finally(() => {
               this.loading = false
             })
         } else {
+          this.changeVerify()
           console.log('error submit!!')
           return false
         }
@@ -233,6 +281,13 @@ $light_gray: #eee;
     padding: 160px 35px 0;
     margin: 0 auto;
     overflow: hidden;
+  }
+  .login-code {
+    height: 40px - 2px;
+    display: block;
+    margin: 0px -20px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
   }
 
   .tips {
