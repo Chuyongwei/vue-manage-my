@@ -19,7 +19,7 @@
       <el-form-item prop="password" label="新密码">
         <el-input
           v-model="loginForm.password"
-          placeholder="输入原始密码"
+          placeholder="输入新密码"
           name="password"
           auto-complete="on"
         />
@@ -27,7 +27,7 @@
       <el-form-item prop="repass" label="确认密码">
         <el-input
           v-model="loginForm.repass"
-          placeholder="Password"
+          placeholder="再次输入密码"
           name="repass"
           auto-complete="on"
         />

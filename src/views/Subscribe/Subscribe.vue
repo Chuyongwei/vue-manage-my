@@ -118,7 +118,7 @@
         width="230"
         class-name="small-padding fixed-width"
       >
-        <template slot-scope="{ row, $index }">
+        <template slot-scope="{ row, }">
           <el-button
             type="success"
             size="mini"
@@ -141,14 +141,14 @@
           >
             Draft
           </el-button> -->
-          <el-button
+          <!-- <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
             @click="handleDelete(row, $index)"
           >
-            Delete
-          </el-button>
+            删除
+          </el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -239,12 +239,12 @@
         </template>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
+        <el-button @click="dialogFormVisible = false"> 返回 </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? createData() : updateData()"
         >
-          Confirm
+          确认
         </el-button>
       </div>
     </el-dialog>
@@ -391,8 +391,8 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: '编辑',
+        create: '创建'
       },
       dialogPvVisible: false,
       pvData: [],

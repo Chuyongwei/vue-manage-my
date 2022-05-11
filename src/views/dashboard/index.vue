@@ -6,10 +6,9 @@
       住院人数 {{ inhospitaltotal }} 预约人数 {{ subscribeTotal }}
     </div>
     <div id="score-static">
-      <div :id="subscribe" style="height:300px;width:600px;" />
-      <div />
-      <div :id="department.id" style="height:400px; width:500px;" />
-      <div />
+      <div :id="subscribe" style="height: 300px; width: 1000px" />
+
+      <div :id="department.id" style="height: 400px; width: 500px" />
     </div>
   </div>
 </template>
@@ -47,14 +46,17 @@ export default {
       console.log('预约', e.data.length)
       this.subscribeTotal = e.data.length
     })
-    this.$axios.post('/doctor/DataStatistics', user).then((e) => {
-      console.log('获得数据', e.data)
-      this.subscribeData = e.data.medicalRecord
-      this.department.data = e.data.deparment
-    }).then(() => {
-      this.initMedicalChart()
-      this.initDepartmet()
-    })
+    this.$axios
+      .post('/doctor/DataStatistics', user)
+      .then((e) => {
+        console.log('获得数据', e.data)
+        this.subscribeData = e.data.medicalRecord
+        this.department.data = e.data.deparment
+      })
+      .then(() => {
+        this.initMedicalChart()
+        this.initDepartmet()
+      })
   },
   methods: {
     initMedicalChart() {
@@ -74,9 +76,7 @@ export default {
         },
         xAxis: { type: 'category' },
         yAxis: {},
-        series: [
-          { type: 'bar' }
-        ]
+        series: [{ type: 'bar' }]
       })
     },
     initDepartmet() {
@@ -135,7 +135,7 @@ export default {
     line-height: 46px;
   }
 }
-#score-static{
+#score-static {
   display: flex;
 }
 </style>

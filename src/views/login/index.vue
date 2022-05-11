@@ -172,7 +172,6 @@ export default {
               console.log('login获取的', e)
               if (e.code === '-1') {
                 this.$message.error('验证码不正确')
-
                 return
               }
               if (e.doctorid != null) {
@@ -183,9 +182,9 @@ export default {
             })
             .finally(() => {
               this.loading = false
+              this.changeVerify()
             })
         } else {
-          this.changeVerify()
           console.log('error submit!!')
           return false
         }

@@ -199,7 +199,7 @@ export default {
         for (let i = 0; i < dutyList2.length; i++) {
           const week = parseInt((i + 21) % 21 / 3)
           const am = i % 3
-          console.log(week, am)
+          // console.log(week, am)
           if (week === 0) { this.dutyList[am] = [] }
           this.dutyList[am][week] = dutyList2[i]
         }

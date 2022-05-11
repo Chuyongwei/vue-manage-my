@@ -10,19 +10,6 @@
         @keyup.enter.native="handleFilter"
       />
 
-      <el-select
-        v-model="listQuery.sort"
-        style="width: 140px"
-        class="filter-item"
-        @change="handleFilter"
-      >
-        <el-option
-          v-for="item in sortOptions"
-          :key="item.key"
-          :label="item.label"
-          :value="item.key"
-        />
-      </el-select>
       <el-button
         v-waves
         class="filter-item"
@@ -30,7 +17,7 @@
         icon="el-icon-search"
         @click="handleFilter"
       >
-        Search
+        搜索
       </el-button>
       <el-button
         v-waves
@@ -42,14 +29,14 @@
       >
         Export
       </el-button>
-      <el-checkbox
+      <!-- <el-checkbox
         v-model="showReviewer"
         class="filter-item"
         style="margin-left: 15px"
         @change="tableKey = tableKey + 1"
       >
         reviewer
-      </el-checkbox>
+      </el-checkbox> -->
     </div>
 
     <!-- 表格 -->
@@ -277,10 +264,6 @@ export default {
         sort: '+id'
       },
       importanceOptions: [1, 2, 3],
-      sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
-      ],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {

@@ -203,7 +203,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
+        <el-button @click="dialogFormVisible = false"> 返回 </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? createData() : updateData()"
